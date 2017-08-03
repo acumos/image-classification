@@ -1,0 +1,14 @@
+# requirements for deployment AND testing
+
+# core deployment packages
+acumos
+numpy
+pillow
+sklearn
+keras
+tensorflow
+
+# testing packages
+connexion
+# pytest
+# pexpect
