@@ -29,7 +29,7 @@ $(document).ready(function() {
 	});
 
 	var hd = $(document.body).data('hdparams');
-	$('#serviceLink').attr("href", hd.classificationServerRoot);
+	//$('#serviceLink').attr("href", hd.classificationServerRoot);
 	hd.video.addEventListener("loadedmetadata", newVideo);
 
 	// add buttons to change video
