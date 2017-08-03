@@ -11,5 +11,5 @@ TBD
 ## Example Instance
 An instance should first be built and downloaded from Cognita and then
 launched locally.  Afterwards, the sample application found in 
-[video_web_client](video_web_client) uses a `localhost` service to classify
+[web_demo](web_demo) uses a `localhost` service to classify
 and visualize the results of image classification.
