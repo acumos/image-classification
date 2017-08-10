@@ -27,7 +27,7 @@ setup(
     #setup_requires=['pytest-runner'],
     install_requires=['cognita_client',
                       'numpy',
-                      'scipy',
+                      'pillow'
                       'keras'],
     tests_require=['pytest',
                    'pexpect'],
