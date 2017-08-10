@@ -35,6 +35,11 @@ def keras_evaluate(config):
 
     # Load test image!
     img = evaluate_image.get_processed_image_keras(config['image'])
+    # import pickle
+    # pickle.dump(img, open("img_keras.csv", 'wb'))
+
+    # img = evaluate_image.get_processed_image_cv(config['image'])
+    # pickle.dump(img, open("img_cv2.csv", 'wb'))
 
     # Run prediction on test image
     preds = model.predict(img)
@@ -45,7 +50,7 @@ def prediction_transform(preds, config):
     df = pd.DataFrame(preds.transpose(), columns=['probability'])
     if config['label_path']:        # Open Class labels dictionary. (human readable label given ID)
         dictClasses = eval(open(config['label_path'], 'r').read())
-        listClasses = [dictClasses[ix] for ix in list(df.index)]
+        listClasses = [dictClasses[ix-1] for ix in list(df.index)]  # NOTE: special -1 offset
         df.insert(0, 'class', listClasses)
     else:
         df.insert(0, 'class', ['class_{:}'.format(idx) for idx in range(len(preds))])
