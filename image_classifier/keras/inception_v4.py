@@ -201,7 +201,7 @@ def inception_v4_base(input):
     # 35 x 35 x 384
     # 4 x Inception-A blocks
     for idx in range(4):
-    	net = block_inception_a(net)
+        net = block_inception_a(net)
 
     # 35 x 35 x 384
     # Reduction-A block
@@ -210,7 +210,7 @@ def inception_v4_base(input):
     # 17 x 17 x 1024
     # 7 x Inception-B blocks
     for idx in range(7):
-    	net = block_inception_b(net)
+        net = block_inception_b(net)
 
     # 17 x 17 x 1024
     # Reduction-B block
@@ -219,21 +219,21 @@ def inception_v4_base(input):
     # 8 x 8 x 1536
     # 3 x Inception-C blocks
     for idx in range(3):
-    	net = block_inception_c(net)
+        net = block_inception_c(net)
 
     return net
 
 
-def inception_v4(num_classes, dropout_keep_prob, weights, include_top):
+def inception_v4(num_classes, dropout_keep_prob, weights, include_top, weights_path=None):
     '''
     Creates the inception v4 network
 
     Args:
-    	num_classes: number of classes
-    	dropout_keep_prob: float, the fraction to keep before final layer.
+        num_classes: number of classes
+        dropout_keep_prob: float, the fraction to keep before final layer.
     
     Returns: 
-    	logits: the logits outputs of the model.
+        logits: the logits outputs of the model.
     '''
 
     # Input Shape is 299 x 299 x 3 (tf) or 3 x 299 x 299 (th)
@@ -269,21 +269,22 @@ def inception_v4(num_classes, dropout_keep_prob, weights, include_top):
                               '`image_data_format="channels_last"` in '
                               'your Keras config '
                               'at ~/.keras/keras.json.')
-        if include_top:
-            weights_path = get_file(
-                'inception-v4_weights_tf_dim_ordering_tf_kernels.h5',
-                WEIGHTS_PATH,
-                cache_subdir='models',
-                md5_hash='9fe79d77f793fe874470d84ca6ba4a3b')
-        else:
-            weights_path = get_file(
-                'inception-v4_weights_tf_dim_ordering_tf_kernels_notop.h5',
-                WEIGHTS_PATH_NO_TOP,
-                cache_subdir='models',
-                md5_hash='9296b46b5971573064d12e4669110969')
+        if weights_path is None:
+            if include_top:
+                weights_path = get_file(
+                    'inception-v4_weights_tf_dim_ordering_tf_kernels.h5',
+                    WEIGHTS_PATH,
+                    cache_subdir='models',
+                    md5_hash='9fe79d77f793fe874470d84ca6ba4a3b')
+            else:
+                weights_path = get_file(
+                    'inception-v4_weights_tf_dim_ordering_tf_kernels_notop.h5',
+                    WEIGHTS_PATH_NO_TOP,
+                    cache_subdir='models',
+                    md5_hash='9296b46b5971573064d12e4669110969')
         model.load_weights(weights_path, by_name=True)
-    return model
+    return model, weights_path
 
 
-def create_model(num_classes=1001, dropout_prob=0.2, weights=None, include_top=True):
-    return inception_v4(num_classes, dropout_prob, weights, include_top)
+def create_model(num_classes=1001, dropout_prob=0.2, weights=None, include_top=True, model_path=None):
+    return inception_v4(num_classes, dropout_prob, weights, include_top, weights_path=model_path)
