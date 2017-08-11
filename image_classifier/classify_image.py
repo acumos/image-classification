@@ -8,13 +8,19 @@ import os.path
 import sys
 
 import numpy as np
+import pandas as pd
 
+MODEL_NAME = 'image_classifier'
 
-def model_create_pipeline(path_model, path_label):
+def model_create_pipeline(path_model, path_label, top_n):
     from sklearn.pipeline import Pipeline
     from image_classifier.keras.prediction_formatter import Formatter
     from image_classifier.keras.evaluate_image import Predictor
     from image_classifier.keras.image_decoder import ImageDecoder
+    from image_classifier.keras import inception_v4
+    import keras
+    dependent_modules = [keras, pd, np]  # define as dependent libraries
+
 
     # read dictionary to pass along to formatter class
     dict_classes = eval(open(path_label, 'r').read()) if path_label else None
@@ -34,23 +40,35 @@ def model_create_pipeline(path_model, path_label):
     pipeline = Pipeline([
         ('decode', ImageDecoder()),
         ('predict', Predictor(path_model)),
-        ('format', Formatter(dict_classes))
+        ('format', Formatter(dict_classes, top_n))
     ])
-    return pipeline
+    return pipeline, dependent_modules
 
 def keras_evaluate(config):
     taskComplete = False
     useSklearn = True
     if useSklearn:
-        pipeline = model_create_pipeline(config['model_path'], config['label_path'])
-        if config.push_address:
+        # munge stream and mimetype into input sample
+        binStream = open(config['image'], 'rb').read()
+        X = pd.DataFrame([['image/jpeg', binStream]], columns=['mime_type', 'binary_stream'])
+        # formulate the pipelien to be used
+        pipeline, EXTRA_DEPS = model_create_pipeline(config['model_path'], config['label_path'],
+                                                     config['num_top_predictions'])
+
+        if config['push_address']:
+            from cognita_client.push import push_sklearn_model
+            push_sklearn_model(pipeline, X, api=config['push_address'], name=MODEL_NAME, extra_deps=EXTRA_DEPS)
             taskComplete = True
-        if config.dump_model:
+
+        if config['dump_model']:
+            from cognita_client.wrap.dump import dump_sklearn_model
+            dump_sklearn_model(pipeline, X, config['dump_model'], name=MODEL_NAME, extra_deps=EXTRA_DEPS)
             taskComplete = True
+
+        preds = None
         if not taskComplete:
             #pipeline.fit(X_train, y_train)
-            binStream = open(config['image'], 'rb').read()
-            preds = pipeline.predict(['image/jpeg', binStream])
+            preds = pipeline.predict(X)
             #print(preds)
 
             # # Save the Keras model first:
@@ -89,8 +107,8 @@ def main():
     parser.add_argument('-i', '--image', type=str, default='',help='Absolute path to image file.')
     parser.add_argument('-f', '--framework', type=str, default='keras',help='Underlying framework to utilize', choices=['keras', 'tensorflow'])
     parser.add_argument('-C', '--cuda_env', type=str, default='',help='Anything special to inject into CUDA_VISIBLE_DEVICES environment string')
-    parser.add_argument('-n', '--num_top_predictions', type=int, default=5, help='Display this many predictions.')
-    parser.add_argument('-a', '--push_address', help='server address to push the model (e.g. http://localhost:8887/v1/models)', default='')
+    parser.add_argument('-n', '--num_top_predictions', type=int, default=30, help='Display this many predictions. (0=disable)')
+    parser.add_argument('-a', '--push_address', help='server address to push the model (e.g. http://localhost:8887/v2/models)', default='')
     parser.add_argument('-d', '--dump_model', help='dump model to a pickle directory for local running', default='')
     config = vars(parser.parse_args())     #pargs, unparsed = parser.parse_known_args()
 
@@ -120,7 +138,9 @@ def main():
             from image_classifier.keras.prediction_formatter import Formatter
             dfPred = Formatter.prediction_transform(preds, None, config['label_path'])
 
-    print("Predictions:\n{:}".format(dfPred[:config['num_top_predictions']]))
+    if config['num_top_predictions'] != 0 and dfPred is not None:
+        dfPred = dfPred[:config['num_top_predictions']]
+    print("Predictions:\n{:}".format(dfPred))
     #print("Certainty is: " + str(preds[0][np.argmax(preds)]))
 
 if __name__ == '__main__':

@@ -20,7 +20,6 @@ class Predictor(BaseEstimator, TransformerMixin):
         self.include_top = include_top
         self.model_path = model_path
         self.model = None
-        self.load_model()
 
     def get_params(self, deep=False):
         # attempt to save model
@@ -37,9 +36,21 @@ class Predictor(BaseEstimator, TransformerMixin):
         """
         Assumes a numpy array for a single image        
         """
+        if type(X)==pd.DataFrame:
+            X = X.as_matrix()
         if not self.model:
-            return X     # failure case, pass through
-        return self.model.predict(X)
+            self.load_model()
+            if not self.model:
+                return X     # failure case, pass through
+
+        np_evaluate_set = None
+        for image_idx in range(len(X)):
+            image_feat = X[image_idx,:]
+            np_evaluate = self.model.predict(image_feat)
+            if np_evaluate_set is None:  # create an NP container for all image samples + features
+                np_evaluate_set = np.empty((len(X),)+np_evaluate.shape)
+            np_evaluate_set[image_idx] = np_evaluate
+        return np_evaluate_set
 
     def load_model(self):
         from image_classifier.keras import inception_v4
