@@ -10,37 +10,72 @@ import sys
 import numpy as np
 
 
-def keras_evaluate(config):
+def model_create_pipeline(path_model, path_label):
+    from sklearn.pipeline import Pipeline
+    from image_classifier.keras.prediction_formatter import Formatter
+    from image_classifier.keras.evaluate_image import Predictor
     from image_classifier.keras.image_decoder import ImageDecoder
-    from image_classifier.keras import inception_v4
-    import shutil
 
-    # default to just 'model.h5' for keras
-    if not config['model_path']:
-        config['model_path'] = 'model.h5'
+    # read dictionary to pass along to formatter class
+    dict_classes = eval(open(path_label, 'r').read()) if path_label else None
 
-    # Create model and load pre-trained weights
-    model_path = config['model_path']
-    if not config['model_path'] or not os.path.exists(config['model_path']):
-        print("Warning: The target model '{:}' was not found, attempting to download archived library.".format(config['model_path']))
-        model_path = None
-    model, model_path = inception_v4.create_model(weights='imagenet', include_top=True, model_path=model_path)
+    # we will create a hybrid keras/scikit pipeline because we need some preprocessing done
+    #   within scikit that is not easily posisble with keras
+    #
+    # stages are as follows (the quoted section is the scikit pipeline name)
+    #   #1 'decode' - input+reshape - decode incoming image with MIME+BINARY as inputs
+    #   #2 'predict' - prediction - input the transformed image to the prediction method
+    #   #3 'format' - predict transform - post-process the predictions into sorted prediction classes
+    # see this page for hints about what happens...
+    #   https://stackoverflow.com/questions/37984304/how-to-save-a-scikit-learn-pipline-with-keras-regressor-inside-to-disk
+    #
+    # NOTE: the last object is an "estimator" type so that we can call "predict", as required by the
+    #       cognita-based wrapper functionality
+    pipeline = Pipeline([
+        ('decode', ImageDecoder()),
+        ('predict', Predictor(path_model)),
+        ('format', Formatter(dict_classes))
+    ])
+    return pipeline
 
-    # if we downlaoded a model, move it to model_path
-    if model_path!=config['model_path'] and os.path.exists(model_path):
-        shutil.move(model_path, config['model_path']) # move into directory
+def keras_evaluate(config):
+    taskComplete = False
+    useSklearn = True
+    if useSklearn:
+        pipeline = model_create_pipeline(config['model_path'], config['label_path'])
+        if config.push_address:
+            taskComplete = True
+        if config.dump_model:
+            taskComplete = True
+        if not taskComplete:
+            #pipeline.fit(X_train, y_train)
+            binStream = open(config['image'], 'rb').read()
+            preds = pipeline.predict(['image/jpeg', binStream])
+            #print(preds)
 
-    # Load test image!
-    img = ImageDecoder.get_processed_image_keras_file(config['image'])  # load image through keras
+            # # Save the Keras model first:
+            # pipeline.named_steps['estimator'].model.save('keras_model.h5')
+            #
+            # # This hack allows us to save the sklearn pipeline:
+            # pipeline.named_steps['estimator'].model = None
+            #
+            # # Finally, save the pipeline:
+            # joblib.dump(pipeline, 'sklearn_pipeline.pkl')
+            #
+            # del pipeline
 
-    # import pickle
-    # pickle.dump(img, open("img_keras.csv", 'wb'))
+    else:
+        from image_classifier.keras import inception_v4
+        from image_classifier.keras.image_decoder import ImageDecoder
 
-    # img = evaluate_image.get_processed_image_cv(config['image'])
-    # pickle.dump(img, open("img_cv2.csv", 'wb'))
+        # Load test image!
+        img = ImageDecoder.get_processed_image_keras_file(config['image'])  # load image through keras
+        # img = evaluate_image.get_processed_image_cv(config['image'])
 
-    # Run prediction on test image
-    preds = model.predict(img)
+        # Run prediction on test image
+        model, model_path = inception_v4.create_model(weights='imagenet', include_top=True, model_path=model_path)
+        preds = model.predict(img)
+
     return preds
 
 
@@ -70,29 +105,20 @@ def main():
     if config['cuda_env']:
         os.environ['CUDA_VISIBLE_DEVICES'] = config['cuda_env']
 
-    # we will create a hybrid keras/scikit pipeline because we need some preprocessing done
-    #   within scikit that is not easily posisble with keras
-    #
-    # stages are as follows (the quoted section is the scikit pipeline name)
-    #   #1 'decode' - input+reshape - decode incoming image with MIME+BINARY as inputs
-    #   #2 'predict' - prediction - input the transformed image to the prediction method
-    #   #3 'format' - predict transform - post-process the predictions into sorted prediction classes
-    # see this page for hints about what happens...
-    #   https://stackoverflow.com/questions/37984304/how-to-save-a-scikit-learn-pipline-with-keras-regressor-inside-to-disk
 
     if not config['predict_path'] or not os.path.exists(config['predict_path']):
         # todo: add other languages and frameworks when available?
         if config['framework'] == 'keras':
-            preds = keras_evaluate(config)
+            dfPred = keras_evaluate(config)
         if config['predict_path']:
             np.savetxt(config['predict_path'], preds, delimiter=",")
     else:
         preds = np.loadtxt(config['predict_path'], delimiter=",")
 
-    # todo: add other languages and frameworks when available?
-    if config['framework'] == 'keras':
-        from image_classifier.keras.prediction_formatter import prediction_transform
-        dfPred = prediction_transform(preds, None, config['label_path'])
+        # todo: add other languages and frameworks when available?
+        if config['framework'] == 'keras':
+            from image_classifier.keras.prediction_formatter import Formatter
+            dfPred = Formatter.prediction_transform(preds, None, config['label_path'])
 
     print("Predictions:\n{:}".format(dfPred[:config['num_top_predictions']]))
     #print("Certainty is: " + str(preds[0][np.argmax(preds)]))
