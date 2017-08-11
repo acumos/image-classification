@@ -6,6 +6,7 @@ Simple scikit-based transformer for transforming a binary image stream into a nu
 
 from __future__ import print_function
 import numpy as np
+import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
 
 from keras import backend as K
@@ -29,7 +30,16 @@ class ImageDecoder(BaseEstimator, TransformerMixin):
         Assumes a numpy array of [[mime_type, binary_string] ... ]
            where mime_type is an image-specifying mime type and binary_string is the raw image bytes       
         """
-        return ImageDecoder.get_processed_image_keras_string(X[1])
+        if type(X) == pd.DataFrame:
+            X = X.as_matrix()
+        np_decode_set = None
+        for image_idx in range(len(X)):
+            image_set = X[image_idx,:]
+            np_decode = ImageDecoder.get_processed_image_keras_string(image_set[1])
+            if np_decode_set is None:  # create an NP container for all image samples + features
+                np_decode_set = np.empty((len(X),)+np_decode.shape)
+            np_decode_set[image_idx] = np_decode
+        return np_decode_set
 
     from keras.preprocessing import image as image_utils
 
