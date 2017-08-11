@@ -17,9 +17,9 @@ from io import BytesIO as StringIO
 from image_classifier.keras import inception_v4
 
 class ImageDecoder(BaseEstimator, TransformerMixin):
-    DEFAULT_IMAGE_SIZE = (299,299,3)
-
     """Using keras methods decode an image from a mime type and a binary string"""
+
+    DEFAULT_IMAGE_SIZE = (299,299,3)
 
     def fit(self, x, y=None):
         return self
@@ -29,8 +29,7 @@ class ImageDecoder(BaseEstimator, TransformerMixin):
         Assumes a numpy array of [[mime_type, binary_string] ... ]
            where mime_type is an image-specifying mime type and binary_string is the raw image bytes       
         """
-        return [ImageDecoder.get_processed_image_keras_string(imageSampleX[0])
-                for imageSampleX in X]
+        return ImageDecoder.get_processed_image_keras_string(X[1])
 
     from keras.preprocessing import image as image_utils
 
@@ -129,7 +128,7 @@ class ImageDecoder(BaseEstimator, TransformerMixin):
         :param target_size: desired size -- should be class default
         :return: 
         """
-        in_memory = StringIO.StringIO(binary_string)
+        in_memory = StringIO(binary_string)
         return ImageDecoder.get_processed_image_keras(in_memory, target_size=target_size)
 
     @staticmethod
