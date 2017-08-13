@@ -13,6 +13,9 @@ from sklearn.base import BaseEstimator, ClassifierMixin
 
 class Formatter(BaseEstimator, ClassifierMixin):
     """Format predictions by binding to class names"""
+    COL_NAME_IDX = "idx"
+    COL_NAME_CLASS = "classes"
+    COL_NAME_PREDICTION = "predictions"
 
     def __init__(self, class_map=None, top_n=30):
         """
@@ -27,6 +30,19 @@ class Formatter(BaseEstimator, ClassifierMixin):
     def get_params(self, deep=False):
         return {'class_map': self.class_map,
                 'top_n': self.top_n}
+
+    @property
+    def output_types_(self):
+        _types = self.classes_
+        return [{Formatter.COL_NAME_IDX: _types[0]}, {Formatter.COL_NAME_CLASS: _types[1]}, {Formatter.COL_NAME_PREDICTION: _types[2]}]
+
+    @property
+    def n_outputs_(self):
+        return 3
+
+    @property
+    def classes_(self):
+        return [int, str, float]
 
     def fit(self, x, y=None):
         return self
@@ -43,7 +59,7 @@ class Formatter(BaseEstimator, ClassifierMixin):
                 self.class_list = Formatter.prediction_list_gen(self.class_map, range(num_class))
 
             df_predict = Formatter.prediction_transform(np_predict, self.class_list)
-            df_predict.insert(0, 'idx', image_idx)
+            df_predict.insert(0, Formatter.COL_NAME_IDX, image_idx)
             if self.top_n != 0:  # need to prune results (already sorted, so just clip)
                 df_predict = df_predict[:self.top_n]
 
@@ -69,15 +85,15 @@ class Formatter(BaseEstimator, ClassifierMixin):
         :param path_class: path for class listing file
         :return: dataframe sorted by descending probability
         """
-        df = pd.DataFrame(preds.transpose(), columns=['probability'])
+        df = pd.DataFrame(preds.transpose(), columns=[Formatter.COL_NAME_PREDICTION])
         if class_list is None:  # must simulate or load the class list
             if not path_class:
-                class_list = ['class_{:}'.format(idx) for idx in range(len(preds))]
+                class_list = ['{:}_{:}'.format(Formatter.COL_NAME_CLASS, idx) for idx in range(len(preds))]
             else:
                 dict_classes = eval(open(path_class, 'r').read())
                 class_list = Formatter.prediction_list_gen(dict_classes, list(df.index))
-        df.insert(0, 'class', class_list)
+        df.insert(0, Formatter.COL_NAME_CLASS, class_list)
 
         #print("Class is: " + classes[np.argmax(preds) - 1])
-        df.sort_values(['probability'], ascending=False, inplace=True)
+        df.sort_values([Formatter.COL_NAME_PREDICTION], ascending=False, inplace=True)
         return df

@@ -57,11 +57,13 @@ def keras_evaluate(config):
 
         if config['push_address']:
             from cognita_client.push import push_sklearn_model
+            print("Pushing new model to '{:}'...".format(config['push_address']))
             push_sklearn_model(pipeline, X, api=config['push_address'], name=MODEL_NAME, extra_deps=EXTRA_DEPS)
             taskComplete = True
 
         if config['dump_model']:
             from cognita_client.wrap.dump import dump_sklearn_model
+            print("Dumping new model to '{:}'...".format(config['dump_model']))
             dump_sklearn_model(pipeline, X, config['dump_model'], name=MODEL_NAME, extra_deps=EXTRA_DEPS)
             taskComplete = True
 
@@ -138,9 +140,10 @@ def main():
             from image_classifier.keras.prediction_formatter import Formatter
             dfPred = Formatter.prediction_transform(preds, None, config['label_path'])
 
-    if config['num_top_predictions'] != 0 and dfPred is not None:
-        dfPred = dfPred[:config['num_top_predictions']]
-    print("Predictions:\n{:}".format(dfPred))
+    if dfPred is not None:
+        if config['num_top_predictions'] != 0:
+            dfPred = dfPred[:config['num_top_predictions']]
+        print("Predictions:\n{:}".format(dfPred))
     #print("Certainty is: " + str(preds[0][np.argmax(preds)]))
 
 if __name__ == '__main__':

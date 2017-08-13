@@ -63,7 +63,7 @@ class Predictor(BaseEstimator, TransformerMixin):
         model_path = self.model_path
         if not self.model_path or not exists(self.model_path):
             print("Warning: The target model '{:}' was not found, attempting to download archived library.".format(
-                config['model_path']))
+                self.model_path))
             model_path = None
         self.model, model_path = inception_v4.create_model(weights=self.weights, include_top=self.include_top, model_path=model_path)
 
