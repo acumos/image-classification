@@ -56,15 +56,15 @@ def keras_evaluate(config):
                                                      config['num_top_predictions'])
 
         if config['push_address']:
-            from cognita_client.push import push_sklearn_model
+            from cognita_client.push import push_skkeras_hybrid_model
             print("Pushing new model to '{:}'...".format(config['push_address']))
-            push_sklearn_model(pipeline, X, api=config['push_address'], name=MODEL_NAME, extra_deps=EXTRA_DEPS)
+            push_skkeras_hybrid_model(pipeline, X, api=config['push_address'], name=MODEL_NAME, extra_deps=EXTRA_DEPS)
             taskComplete = True
 
         if config['dump_model']:
-            from cognita_client.wrap.dump import dump_sklearn_model
+            from cognita_client.wrap.dump import dump_skkeras_hybrid_model
             print("Dumping new model to '{:}'...".format(config['dump_model']))
-            dump_sklearn_model(pipeline, X, config['dump_model'], name=MODEL_NAME, extra_deps=EXTRA_DEPS)
+            dump_skkeras_hybrid_model(pipeline, X, config['dump_model'], name=MODEL_NAME, extra_deps=EXTRA_DEPS)
             taskComplete = True
 
         preds = None

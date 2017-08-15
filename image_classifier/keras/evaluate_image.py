@@ -21,6 +21,15 @@ class Predictor(BaseEstimator, TransformerMixin):
         self.model_path = model_path
         self.model = None
 
+    def keras_model_(self, model_data):
+        if model_data is None:
+            if self.model is None:
+                self.load_model()
+            model_return = self.model
+            self.model = None
+            return model_return
+        self.model = model_data
+
     def get_params(self, deep=False):
         # attempt to save model
         return {
@@ -51,6 +60,8 @@ class Predictor(BaseEstimator, TransformerMixin):
                 np_evaluate_set = np.empty((len(X),)+np_evaluate.shape)
             np_evaluate_set[image_idx] = np_evaluate
         return np_evaluate_set
+
+
 
     def load_model(self):
         from image_classifier.keras import inception_v4
