@@ -9,13 +9,18 @@ import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
 
-from keras import backend as K
-from keras.preprocessing import image as image_utils
-
 # utility for handling string as a file object (prefer python3)
 from io import BytesIO as StringIO
 
+import keras
+from keras.preprocessing import image as image_utils
+
 from image_classifier.keras import inception_v4
+
+def image_channels_first():
+    from keras import backend as K
+    return K.image_data_format() == "channels_first"
+
 
 class ImageDecoder(BaseEstimator, TransformerMixin):
     """Using keras methods decode an image from a mime type and a binary string"""
@@ -92,7 +97,7 @@ class ImageDecoder(BaseEstimator, TransformerMixin):
         im = central_crop(im, 0.875)
         im = cv2.resize(im, (target_size[0], target_size[1]))
         im = inception_v4.preprocess_input(im)
-        if K.image_data_format() == "channels_first":
+        if image_channels_first():
             im = np.transpose(im, (2, 0, 1))
             im = im.reshape(-1, target_size[2], target_size[0], target_size[1])
         else:
@@ -111,7 +116,7 @@ class ImageDecoder(BaseEstimator, TransformerMixin):
         # im = central_crop(im, 0.875)
         # im = cv2.resize(im, (299, 299))
         im = inception_v4.preprocess_input(im)
-        if K.image_data_format() == "channels_first":
+        if image_channels_first():
             im = np.transpose(im, (2, 0, 1))
             im = im.reshape(-1, target_size[2], target_size[0], target_size[1])
         else:
@@ -151,7 +156,7 @@ class ImageDecoder(BaseEstimator, TransformerMixin):
 
         im = inception_v4.preprocess_input(image)
 
-        if K.image_data_format() == "channels_first":
+        if image_channels_first():
             im = np.transpose(im, (2, 0, 1))
             im = im.reshape(-1, target_size[2], target_size[0], target_size[1])
         else:
