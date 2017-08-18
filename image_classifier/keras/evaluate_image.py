@@ -64,11 +64,15 @@ class Predictor(BaseEstimator, TransformerMixin):
 
 
     def load_model(self):
-        from image_classifier.keras import inception_v4
-
         # default to just 'model.h5' for keras
         if not self.model_path:
             self.model_path = 'model.h5'
+        if self.model is not None:
+            print("Warning: The internal model was valid, skipping load attempt from '{:}'.".format(self.model_path))
+            return
+
+        # note: this should not be needed with a runtime/trained model
+        from image_classifier.keras import inception_v4
 
         # Create model and load pre-trained weights
         model_path = self.model_path
