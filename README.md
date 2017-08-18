@@ -61,7 +61,7 @@ Example for evaluation of a test image with top 5 results.
 ## Image Classification Tensorflow Use-case (Cognita)
 This source code creates and pushes a model into Cognita that processes
 incoming images and outputs a number of classification probability values.
-This model uses the pretrained network from [inception_v3](http://download.tensorflow.org/models/image/imagenet/inception-2015-12-05.tgz) and closely
+This model uses the pretrained network from [inception_v4](https://github.com/kentsommer/keras-inceptionV4) and closely
 follows the [image classification example](https://tensorflow.org/tutorials/image_recognition/)
 provided as part of the tensorflow documentation.
 
