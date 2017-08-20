@@ -55,13 +55,13 @@ def keras_evaluate(config):
         pipeline, EXTRA_DEPS = model_create_pipeline(config['model_path'], config['label_path'],
                                                      config['num_top_predictions'])
 
-        if config['push_address']:
+        if 'push_address' in config and config['push_address']:
             from cognita_client.push import push_skkeras_hybrid_model
             print("Pushing new model to '{:}'...".format(config['push_address']))
             push_skkeras_hybrid_model(pipeline, X, api=config['push_address'], name=MODEL_NAME, extra_deps=EXTRA_DEPS)
             taskComplete = True
 
-        if config['dump_model']:
+        if 'dump_model' in config and config['dump_model']:
             from cognita_client.wrap.dump import dump_skkeras_hybrid_model
             print("Dumping new model to '{:}'...".format(config['dump_model']))
             dump_skkeras_hybrid_model(pipeline, X, config['dump_model'], name=MODEL_NAME, extra_deps=EXTRA_DEPS)
@@ -69,20 +69,8 @@ def keras_evaluate(config):
 
         preds = None
         if not taskComplete:
-            #pipeline.fit(X_train, y_train)
+            print("Attempting clasification with image {:}...".format(config['image']))
             preds = pipeline.predict(X)
-            #print(preds)
-
-            # # Save the Keras model first:
-            # pipeline.named_steps['estimator'].model.save('keras_model.h5')
-            #
-            # # This hack allows us to save the sklearn pipeline:
-            # pipeline.named_steps['estimator'].model = None
-            #
-            # # Finally, save the pipeline:
-            # joblib.dump(pipeline, 'sklearn_pipeline.pkl')
-            #
-            # del pipeline
 
     else:
         from image_classifier.keras import inception_v4
@@ -100,19 +88,20 @@ def keras_evaluate(config):
 
 
 
-def main():
+def main(config={}):
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('-m', '--model_path', type=str, default='', help="Path to read and store image model.")
     parser.add_argument('-l', '--label_path', type=str, default='', help="Path to class label file, unnamed if empty (i.e. data/keras_class_names.txt).")
     parser.add_argument('-p', '--predict_path', type=str, default='', help="Optional place to save intermediate predictions from model (if provided, skips model call)")
-    parser.add_argument('-i', '--image', type=str, default='',help='Absolute path to image file.')
+    parser.add_argument('-i', '--image', type=str, default='',help='Absolute path to image file. (for now must be a jpeg)')
     parser.add_argument('-f', '--framework', type=str, default='keras',help='Underlying framework to utilize', choices=['keras', 'tensorflow'])
     parser.add_argument('-C', '--cuda_env', type=str, default='',help='Anything special to inject into CUDA_VISIBLE_DEVICES environment string')
     parser.add_argument('-n', '--num_top_predictions', type=int, default=30, help='Display this many predictions. (0=disable)')
     parser.add_argument('-a', '--push_address', help='server address to push the model (e.g. http://localhost:8887/v2/models)', default='')
     parser.add_argument('-d', '--dump_model', help='dump model to a pickle directory for local running', default='')
-    config = vars(parser.parse_args())     #pargs, unparsed = parser.parse_known_args()
+    config.update(vars(parser.parse_args()))     #pargs, unparsed = parser.parse_known_args()
+
 
     if config['framework']!='keras':
         print("Sorry, at this time only the 'keras' framework is supported.")

@@ -21,6 +21,7 @@ setup(
     license = "Apache",
     package_data={'image_classification':['data/*']},
     scripts=['bin/run_image-classifier_reference.py'],
+    setup_requires=['pytest-runner'],
     entry_points="""
     [console_scripts]
     """,
