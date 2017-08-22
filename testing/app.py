@@ -9,6 +9,7 @@ from functools import partial
 
 import requests
 from flask import Flask, request, current_app
+import pprint
 
 from cognita_client.wrap.load import load_model
 import pandas as pd
@@ -16,31 +17,19 @@ import pandas as pd
 #def invoke_method(model_method):
 def transform(mime_type, image_binary):
     app = current_app
-    # exists = pet_id in PETS
-    # pet['id'] = pet_id
-    # if exists:
-    #     logging.info('Updating pet %s..', pet_id)
-    #     PETS[pet_id].update(pet)
-    # else:
-    #     logging.info('Creating pet %s..', pet_id)
-    #     pet['created'] = datetime.datetime.utcnow()
-    #     PETS[pet_id] = pet
-
     image_read = image_binary.stream.read()
     X = pd.DataFrame([['image/jpeg', image_read]], columns=['mime_type', 'binary_stream'])
 
     pred = app.model.transform.from_native(X).as_native()
+    retObj = pred.to_dict(orient='records')
+    pp = pprint.PrettyPrinter(indent=2)
+    retStr = pp.pformat(retObj)
+
     print(type(pred))
-    print(pred)
+    print(retStr[:min(200,len(retStr))])
+    #print(pred)
 
-    # resp = target_model.transform.from_native(X)
-    # pred = resp.as_native()
-    #
-    # outC = os.path.join(tdir, "{}.class.csv".format(fileKey))
-    # pred.to_csv(outC)
-    # print("{:} -> {:}".format(train_path, pred))
-
-    return 'OK', 201
+    return retStr, 200
 
 
 if __name__ == '__main__':

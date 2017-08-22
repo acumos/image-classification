@@ -15,5 +15,11 @@ optional arguments:
   --modeldir MODELDIR
 ```
 
-## Single Image Upload
-View the swagger-generated UI at [http://localhost:8885/ui].
+## Image Classifier Evaluation
+
+* For a graphical experience, view the swagger-generated UI at [http://localhost:8885/ui].
+* Additionally, a simple command-line utility could be used to post an image
+and mime type to the main interface.
+```
+curl -F image_binary=@test.jpg -F mime_type="image/jpeg" "http://localhost:8885/transform"
+```
