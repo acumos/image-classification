@@ -1,0 +1,36 @@
+swagger: '2.0'
+info:
+  title: Image Classifier Example
+  version: "0.1"
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /transform:
+    post:
+      operationId: app.transform
+      summary: Post an image for processing
+      parameters:
+        - $ref: '#/parameters/mime_type'
+        - $ref: '#/parameters/image_binary'
+      responses:
+        200:
+          description: Image processed
+
+parameters:
+  mime_type:
+    name: mime_type
+    description: Image MimeType
+    in: formData
+    type: string
+    required: true
+    default: 'image/jpeg'
+    # pattern: "^[a-zA-Z0-9-]+$"
+  image_binary:
+    name: image_binary
+    description: Binary image blob
+    in: formData
+    type: file
+    required: true
+
