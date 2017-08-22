@@ -74,6 +74,8 @@ class Formatter(BaseEstimator, ClassifierMixin):
 
     @staticmethod
     def prediction_list_gen(dict_classes, list_idx):
+        if dict_classes is None:
+            return ['{:}_{:}'.format(Formatter.COL_NAME_CLASS, ix) for ix in list_idx]
         return [dict_classes[ix - 1] for ix in list_idx]  # NOTE: special -1 offset
 
     @staticmethod
@@ -87,11 +89,10 @@ class Formatter(BaseEstimator, ClassifierMixin):
         """
         df = pd.DataFrame(preds.transpose(), columns=[Formatter.COL_NAME_PREDICTION])
         if class_list is None:  # must simulate or load the class list
-            if not path_class:
-                class_list = ['{:}_{:}'.format(Formatter.COL_NAME_CLASS, idx) for idx in range(len(preds))]
-            else:
+            dict_classes = None
+            if path_class is None or not path_class:
                 dict_classes = eval(open(path_class, 'r').read())
-                class_list = Formatter.prediction_list_gen(dict_classes, list(df.index))
+            class_list = Formatter.prediction_list_gen(dict_classes, list(df.index))
         df.insert(0, Formatter.COL_NAME_CLASS, class_list)
 
         #print("Class is: " + classes[np.argmax(preds) - 1])
