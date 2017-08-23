@@ -16,21 +16,30 @@
  */
 $(document).ready(function() {
 	$(document.body).data('hdparams', {	// store global vars in the body element
-		classificationServerRoot: "http://135.207.105.218:8100",   // Renders HTML for file upload
-		classificationServer: "http://135.207.105.218:8100/upload",
+		classificationServerFirewallRoot: "http://135.207.105.218:8100",   // Renders HTML for file upload
+		classificationServerFirewall: "http://135.207.105.218:8100/upload",
+		classificationServerLocalhost: "http://localhost:8885/transform",
 		frameCounter: 0,
 		totalFrames: 900000,	// stop after this many frames just to avoid sending frames forever if someone leaves page up
 		frameInterval: 500,		// Milliseconds to sleep between sending frames to reduce server load and reduce results updates
 		frameTimer: -1,		// frame clock for processing
 		maxSrcVideoWidth: 512,	// maximum image width for processing
+		serverIsLocal: true,    // server is local versus 'firewall' version
+		imageIsWaiting: false,  // blocking to prevent too many queued frames
 		// Objects from DOM elements
 		video: document.getElementById('srcVideo'),
 		srcImgCanvas: document.getElementById('srcImgCanvas'),	// we have a 'src' source image 
 	});
 
 	var hd = $(document.body).data('hdparams');
-	//$('#serviceLink').attr("href", hd.classificationServerRoot);
+	//$('#serviceLink').attr("href", hd.classificationServerFirewallRoot);
 	hd.video.addEventListener("loadedmetadata", newVideo);
+
+	//add checkbox tweak
+	$("#serverToggle").change(function() {
+	    var valLast = $(document.body).data('hdparams')['serverIsLocal'];
+	    $(document.body).data('hdparams')['serverIsLocal'] = !valLast;
+	}).attr("checked", "checked" ? $(document.body).data('hdparams')['serverIsLocal'] : "")
 
 	// add buttons to change video
 	$.each(videos, function(key) {
@@ -100,24 +109,38 @@ function nextFrame() {
 	var w = hd.srcImgCanvas.width;
 	var h = hd.srcImgCanvas.height;
 	srcImgContext.drawImage(hd.video, 0, 0, w, h);
-	doPostImage(hd.classificationServer, hd.srcImgCanvas, '#resultsDiv');
-	hd.frameCounter++;
+	if (!hd.imageIsWaiting) {
+        doPostImage(hd.srcImgCanvas, '#resultsDiv');
+        hd.frameCounter++;
+    }
 }
 
 /**
  * post an image from the canvas to the service
  */
-function doPostImage(serviceURL, srcCanvas, dstDiv) {
+function doPostImage(srcCanvas, dstDiv) {
+	var serviceURL = "";
 	var dataURL = srcCanvas.toDataURL('image/jpeg', 0.5);
 	var blob = dataURItoBlob(dataURL);
+	var hd = $(document.body).data('hdparams');
 	var fd = new FormData();
-	fd.append("myFile", blob);
-	fd.append("rtnformat", "json");
-	fd.append("myList", "5");	// limit the number of classes (max 1000)
+	if (hd.serverIsLocal) {
+	    serviceURL = hd.classificationServerLocalhost;
+        fd.append("image_binary", blob);
+        fd.append("mime_type", "image/jpeg");
+	}
+	else {
+	    serviceURL = hd.classificationServerFirewall;
+        fd.append("myFile", blob);
+        fd.append("rtnformat", "json");
+        fd.append("myList", "5");	// limit the number of classes (max 1000)
+	}
 	var request = new XMLHttpRequest();
+	hd.imageIsWaiting = true;
 	request.onreadystatechange=function() {
 		if (request.readyState==4 && request.status==200) {
-			genClassTable(JSON.parse(request.responseText), dstDiv);
+			genClassTable($.parseJSON(request.responseText), dstDiv);
+			hd.imageIsWaiting = false;
 		}
 	}
 	request.open("POST", serviceURL, true);
@@ -136,6 +159,7 @@ function genClassTable (data, div) {
 				.append($('<th />').append('Class'))
 				.append($('<th />').append('Score'))
 				);
+
 	$.each(data.results.classes, function(k, v) {
 		if (count < limit && v.score >= minScore) {
 			var fade = (v.score > 1.0) ? 1 : v.score;	// face out low confidence classes
