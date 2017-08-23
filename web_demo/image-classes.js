@@ -160,16 +160,31 @@ function genClassTable (data, div) {
 				.append($('<th />').append('Score'))
 				);
 
-	$.each(data.results.classes, function(k, v) {
-		if (count < limit && v.score >= minScore) {
-			var fade = (v.score > 1.0) ? 1 : v.score;	// face out low confidence classes
-			classTable.append($('<tr />').css('opacity', fade)
-				.append($('<td />').append(v.class))
-				.append($('<td />').append(parseFloat(v.score).toFixed(2)))
-				);
-			count++;
-		}
-	});
+    if ('results' in data) {
+        $.each(data.results.classes, function(k, v) {
+            if (count < limit && v.score >= minScore) {
+                var fade = (v.score > 1.0) ? 1 : v.score;	// fade out low confidence classes
+                classTable.append($('<tr />').css('opacity', fade)
+                    .append($('<td />').append(v.class))
+                    .append($('<td />').append(parseFloat(v.score).toFixed(2)))
+                    );
+                count++;
+            }
+        });
+    }
+    else {  //expecting flat data
+        $.each(data, function(i,v) {
+            if (count < limit && v.predictions >= minScore) {
+                var fade = (v.predictions > 1.0) ? 1 : v.predictions;	// fade out low confidence classes
+                classTable.append($('<tr />').css('opacity', fade)
+                    .append($('<td />').append(v.classes))
+                    .append($('<td />').append(parseFloat(v.predictions).toFixed(2)))
+                    );
+                count++;
+            }
+        });
+    }
+
 	$(div).append(classTable);
 }
 
