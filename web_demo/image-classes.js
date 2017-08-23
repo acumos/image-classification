@@ -82,6 +82,7 @@ function switchVideo(n) {
 function newVideo() {
 	var hd = $(document.body).data('hdparams');
 	hd.frameCounter = 0;
+	hd.imageIsWaiting = false;
 	hd.video.play();
 
 	// set processing canvas size based on source video
