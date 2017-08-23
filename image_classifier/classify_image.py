@@ -17,7 +17,6 @@ def model_create_pipeline(path_model, path_label, top_n):
     from image_classifier.keras.prediction_formatter import Formatter
     from image_classifier.keras.evaluate_image import Predictor
     from image_classifier.keras.image_decoder import ImageDecoder
-    from image_classifier.keras import inception_v4
     import keras
     dependent_modules = [keras, pd, np]  # define as dependent libraries
 
