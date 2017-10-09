@@ -17,6 +17,7 @@ script and has the following arguments.
 ```
 usage: run_image-classifier_reference.py [-h] [-m MODEL_PATH] [-l LABEL_PATH]
                                          [-p PREDICT_PATH] [-i IMAGE]
+                                         [-I IMAGE_LIST]
                                          [-f {keras,tensorflow}] [-C CUDA_ENV]
                                          [-n NUM_TOP_PREDICTIONS]
                                          [-a PUSH_ADDRESS] [-d DUMP_MODEL]
@@ -32,7 +33,9 @@ optional arguments:
                         Optional place to save intermediate predictions from
                         model (if provided, skips model call)
   -i IMAGE, --image IMAGE
-                        Absolute path to image file.
+                        Absolute path to image file. (for now must be a jpeg)
+  -I IMAGE_LIST, --image_list IMAGE_LIST
+                        To batch process multiple images in one load
   -f {keras,tensorflow}, --framework {keras,tensorflow}
                         Underlying framework to utilize
   -C CUDA_ENV, --cuda_env CUDA_ENV
@@ -45,7 +48,6 @@ optional arguments:
                         http://localhost:8887/v2/models)
   -d DUMP_MODEL, --dump_model DUMP_MODEL
                         dump model to a pickle directory for local running
-
 ```
 
 
@@ -55,10 +57,13 @@ Example for evaluation of a test image with top 5 results.
 /bin/run_local.sh -m model.h5 -i data/model-t.jpg -f keras -l data/keras_class_names.txt -n 5
 ```
 
+Example for evaluation of a multiple image with all results, saving predictions. __(Added v0.3)__
+```
+/bin/run_local.sh -m model.h5 -I data/image_list.txt -f keras -p data/features.csv -l data/keras_class_names.txt -n 0
+```
 
 
-
-## Image Classification Tensorflow Use-case (Cognita)
+## Image Classification Use-case (Cognita)
 This source code creates and pushes a model into Cognita that processes
 incoming images and outputs a number of classification probability values.
 This model uses the pretrained network from [inception_v4](https://github.com/kentsommer/keras-inceptionV4) and closely
