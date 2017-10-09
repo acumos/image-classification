@@ -43,13 +43,24 @@ def model_create_pipeline(path_model, path_label, top_n):
     ])
     return pipeline, dependent_modules
 
+def create_sample(path_image):
+    # munge stream and mimetype into input sample
+    binStream = open(path_image, 'rb').read()
+    X = pd.DataFrame([['image/jpeg', binStream]], columns=['mime_type', 'binary_stream'])
+    return X
+
 def keras_evaluate(config):
     taskComplete = False
     useSklearn = True
+    listImages = []
+
+    if 'image_list' in config and config['image_list']:
+        dfImages = pd.read_csv(config['image_list'], header=None, names=['file'], delimiter=",")
+        listImages = dfImages['file'].tolist()
+        config['image'] = listImages[0]
+    X = create_sample(config['image'])
+
     if useSklearn:
-        # munge stream and mimetype into input sample
-        binStream = open(config['image'], 'rb').read()
-        X = pd.DataFrame([['image/jpeg', binStream]], columns=['mime_type', 'binary_stream'])
         # formulate the pipelien to be used
         pipeline, EXTRA_DEPS = model_create_pipeline(config['model_path'], config['label_path'],
                                                      config['num_top_predictions'])
@@ -68,8 +79,20 @@ def keras_evaluate(config):
 
         preds = None
         if not taskComplete:
-            print("Attempting clasification with image {:}...".format(config['image']))
-            preds = pipeline.predict(X)
+            if not listImages:
+                listImages = [ config['image'] ]
+            preds = None
+            for idx in range(len(listImages)):
+                curImage = listImages[idx]
+                X = create_sample(curImage)
+                print("Attempting classification of image {:}...".format(curImage))
+                predNew = pipeline.predict(X)
+                predNew['idx'] = idx
+                if preds is None:
+                    preds = predNew
+                else:
+                    preds = preds.append(predNew, ignore_index=True)
+            preds.reset_index(drop=True, inplace=True)
 
     else:
         from image_classifier.keras import inception_v4
@@ -94,6 +117,7 @@ def main(config={}):
     parser.add_argument('-l', '--label_path', type=str, default='', help="Path to class label file, unnamed if empty (i.e. data/keras_class_names.txt).")
     parser.add_argument('-p', '--predict_path', type=str, default='', help="Optional place to save intermediate predictions from model (if provided, skips model call)")
     parser.add_argument('-i', '--image', type=str, default='',help='Absolute path to image file. (for now must be a jpeg)')
+    parser.add_argument('-I', '--image_list', type=str, default='',help='To batch process multiple images in one load')
     parser.add_argument('-f', '--framework', type=str, default='keras',help='Underlying framework to utilize', choices=['keras', 'tensorflow'])
     parser.add_argument('-C', '--cuda_env', type=str, default='',help='Anything special to inject into CUDA_VISIBLE_DEVICES environment string')
     parser.add_argument('-n', '--num_top_predictions', type=int, default=30, help='Display this many predictions. (0=disable)')
@@ -105,7 +129,7 @@ def main(config={}):
     if config['framework']!='keras':
         print("Sorry, at this time only the 'keras' framework is supported.")
         sys.exit(-1)
-    if not os.path.exists(config['image']):
+    if not os.path.exists(config['image']) and not config['image_list']:
         print("The target image '{:}' was not found, please check input arguments.".format(config['image']))
         sys.exit(-1)
 
@@ -113,24 +137,14 @@ def main(config={}):
     if config['cuda_env']:
         os.environ['CUDA_VISIBLE_DEVICES'] = config['cuda_env']
 
-
     if not config['predict_path'] or not os.path.exists(config['predict_path']):
         # todo: add other languages and frameworks when available?
         if config['framework'] == 'keras':
             dfPred = keras_evaluate(config)
         if config['predict_path']:
-            np.savetxt(config['predict_path'], preds, delimiter=",")
-    else:
-        preds = np.loadtxt(config['predict_path'], delimiter=",")
-
-        # todo: add other languages and frameworks when available?
-        if config['framework'] == 'keras':
-            from image_classifier.keras.prediction_formatter import Formatter
-            dfPred = Formatter.prediction_transform(preds, None, config['label_path'])
+            dfPred.to_csv(config['predict_path'], sep=',')
 
     if dfPred is not None:
-        if config['num_top_predictions'] != 0:
-            dfPred = dfPred[:config['num_top_predictions']]
         print("Predictions:\n{:}".format(dfPred))
     #print("Certainty is: " + str(preds[0][np.argmax(preds)]))
 

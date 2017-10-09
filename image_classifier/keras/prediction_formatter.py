@@ -66,8 +66,8 @@ class Formatter(BaseEstimator, ClassifierMixin):
             if df_predict_set is None:
                 df_predict_set = df_predict
             else:
-                df_predict_set.append(df_predict)
-        return df_predict_set
+                df_predict_set = df_predict_set.append(df_predict, ignore_index=True)
+        return df_predict_set.reset_index(drop=True)
 
     def score(self, X, y=None):
         return 0
