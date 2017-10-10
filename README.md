@@ -54,12 +54,12 @@ optional arguments:
 ### Examples
 Example for evaluation of a test image with top 5 results.
 ```
-/bin/run_local.sh -m model.h5 -i data/model-t.jpg -f keras -l data/keras_class_names.txt -n 5
+./bin/run_local.sh -m model.h5 -i data/model-t.jpg -f keras -l data/keras_class_names.txt -n 5
 ```
 
 Example for evaluation of a multiple image with all results, saving predictions. __(Added v0.3)__
 ```
-/bin/run_local.sh -m model.h5 -I data/image_list.txt -f keras -p data/features.csv -l data/keras_class_names.txt -n 0
+./bin/run_local.sh -m model.h5 -I data/image_list.txt -f keras -p data/features.csv -l data/keras_class_names.txt -n 0
 ```
 
 

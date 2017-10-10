@@ -137,16 +137,17 @@ def main(config={}):
     if config['cuda_env']:
         os.environ['CUDA_VISIBLE_DEVICES'] = config['cuda_env']
 
-    if not config['predict_path'] or not os.path.exists(config['predict_path']):
+    if config['predict_path']:
         # todo: add other languages and frameworks when available?
+        dfPred = pd.DataFrame()
         if config['framework'] == 'keras':
             dfPred = keras_evaluate(config)
         if config['predict_path']:
-            dfPred.to_csv(config['predict_path'], sep=',')
+            dfPred.to_csv(config['predict_path'], sep=',', index=False)
 
-    if dfPred is not None:
-        print("Predictions:\n{:}".format(dfPred))
-    #print("Certainty is: " + str(preds[0][np.argmax(preds)]))
+        if dfPred is not None:
+            print("Predictions:\n{:}".format(dfPred))
+        #print("Certainty is: " + str(preds[0][np.argmax(preds)]))
 
 if __name__ == '__main__':
     main()
