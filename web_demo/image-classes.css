@@ -58,3 +58,8 @@ button {
     cursor: pointer;
 	border-radius: 6px;
 }
+
+.tiny {
+    font-size: x-small;
+    text-transform: uppercase;
+}

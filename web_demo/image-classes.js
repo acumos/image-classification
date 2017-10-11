@@ -15,10 +15,14 @@
  * main entry point
  */
 $(document).ready(function() {
+    var urlDefault = getUrlParameter('url-image');
+    if (!urlDefault)
+        urlDefault = "http://localhost:8885/transform";
+
 	$(document.body).data('hdparams', {	// store global vars in the body element
 		classificationServerFirewallRoot: "http://135.207.105.218:8100",   // Renders HTML for file upload
 		classificationServerFirewall: "http://135.207.105.218:8100/upload",
-		classificationServerLocalhost: "http://localhost:8885/transform",
+		classificationServer: urlDefault,
 		frameCounter: 0,
 		totalFrames: 900000,	// stop after this many frames just to avoid sending frames forever if someone leaves page up
 		frameInterval: 500,		// Milliseconds to sleep between sending frames to reduce server load and reduce results updates
@@ -35,11 +39,13 @@ $(document).ready(function() {
 	//$('#serviceLink').attr("href", hd.classificationServerFirewallRoot);
 	hd.video.addEventListener("loadedmetadata", newVideo);
 
-	//add checkbox tweak
-	$("#serverToggle").change(function() {
-	    var valLast = $(document.body).data('hdparams')['serverIsLocal'];
-	    $(document.body).data('hdparams')['serverIsLocal'] = !valLast;
-	}).attr("checked", "checked" ? $(document.body).data('hdparams')['serverIsLocal'] : "")
+	//add text input tweak
+	$("#serverUrl").change(function() {
+	    $(document.body).data('hdparams')['classificationServer'] = $(this).val;
+        updateLink("serverLink");
+	}).val($(document.body).data('hdparams')['classificationServer'])
+	//set launch link at first
+    updateLink("serverLink");
 
 	// add buttons to change video
 	$.each(videos, function(key) {
@@ -48,6 +54,27 @@ $(document).ready(function() {
 	});
 });
 
+function updateLink(domId) {
+    var sPageURL = decodeURIComponent(window.location.search.split('?')[0]);
+    console.log(sPageURL);
+    $("#"+domId).attr('href', sPageURL+"?url-image="+$(document.body).data('hdparams')['classificationServer']);
+}
+
+// https://stackoverflow.com/questions/19491336/get-url-parameter-jquery-or-how-to-get-query-string-values-in-js
+function getUrlParameter(sParam) {
+    var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
+
+    for (i = 0; i < sURLVariables.length; i++) {
+        sParameterName = sURLVariables[i].split('=');
+
+        if (sParameterName[0] === sParam) {
+            return sParameterName[1] === undefined ? true : sParameterName[1];
+        }
+    }
+};
 
 /**
  * Change the video source and restart
@@ -125,12 +152,12 @@ function doPostImage(srcCanvas, dstDiv) {
 	var blob = dataURItoBlob(dataURL);
 	var hd = $(document.body).data('hdparams');
 	var fd = new FormData();
-	if (hd.serverIsLocal) {
-	    serviceURL = hd.classificationServerLocalhost;
+	if (true) { // hd.serverIsLocal) {
+	    serviceURL = hd.classificationServer;
         fd.append("image_binary", blob);
         fd.append("mime_type", "image/jpeg");
 	}
-	else {
+	else {      //disabled now for direct URL specification
 	    serviceURL = hd.classificationServerFirewall;
         fd.append("myFile", blob);
         fd.append("rtnformat", "json");

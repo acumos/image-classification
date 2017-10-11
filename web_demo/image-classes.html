@@ -20,7 +20,10 @@ Your browser does not support the video tag. Please use Chrome.
 <div id="resultsDiv">Image Classification</div>
 <br/>
 <div id='videoSelector'></div>
-<form><label for="serverToggle">Utilize Localhost</label><input type="checkbox" name="serverToggle" id="serverToggle" checked="checked" /></form>
+<form>
+    <label for="serverUrl">Transform URL:</label><input type="text" name="serverUrl" id="serverUrl" size="60" />
+    <br /><span class="tiny"><strong>PRO TIP:</strong>Add the query parameter <em><a href="." id="serverLink">url-image</a></em> to auto-load this URL.</span>
+</form>
 <div id='refline' style='width:900'>
 <br/>Image classification using deep convolutional neural nets (CNNs) and the
 <a href="https://www.tensorflow.org/versions/r0.12/tutorials/image_recognition/index.html">TensorFlow</a>
@@ -34,7 +37,7 @@ The dataset consists of <a href="http://image-net.org/challenges/LSVRC/2014/brow
 <br/>
 <br/>
 <a href='http://www.research.att.com/projects/Video/'>Video and Multimedia Technologies Research</a>
-</div>
 <canvas id="srcImgCanvas" width="480" height="270" style="visibility:hidden"></canvas>
+</div>
 </body>
 </html>
