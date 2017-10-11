@@ -12,11 +12,10 @@ optional arguments:
   -h, --help           show this help message and exit
   --port PORT          port to launch the simple web server
   --modeldir MODELDIR  model directory to load dumped artifact
-  --rich_return        output rich JSON instead of direct prediction
 ```
 
 ### Output formats
-The optional parameter `--rich_return` will generate a more decorated JSON output
+The optional HTTP parameter `rich_output` will generate a more decorated JSON output
  that is also understood by the included web application.
 
 * standard output - from `DataFrame` version of the prediction
@@ -84,5 +83,5 @@ The optional parameter `--rich_return` will generate a more decorated JSON outpu
 * Additionally, a simple command-line utility could be used to post an image
 and mime type to the main interface.
 ```
-curl -F image_binary=@test.jpg -F mime_type="image/jpeg" "http://localhost:8885/transform"
+curl -F image_binary=@test.jpg -F rich_output="true" -F mime_type="image/jpeg" "http://localhost:8885/transform"
 ```

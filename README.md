@@ -52,6 +52,11 @@ optional arguments:
 
 
 ### Examples
+Example for training a model that will return the top 100 classifier scores.
+```
+./bin/run_local.sh -m model.h5 -f keras -l data/keras_class_names.txt -n 100 -d model -i data/elephant.jpg
+```
+
 Example for evaluation of a test image with top 5 results.
 ```
 ./bin/run_local.sh -m model.h5 -i data/model-t.jpg -f keras -l data/keras_class_names.txt -n 5
