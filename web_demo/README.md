@@ -12,7 +12,7 @@ To utilize this demo...
 * download this directory to your local machine
   * confirm the host port and classification service URL in the file `image-classes.js`
 ```
-classificationServer: "http://135.207.105.218:8100/upload",
+classificationServer: "http://localhost:8885/transform",
 ```
 
 * view the page `image-classes.html` in a Crome or Firefox browser (sorry other browsers may not properly serve the HTML5 video tag)
