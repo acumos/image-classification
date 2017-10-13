@@ -49,7 +49,7 @@ $(document).ready(function() {
 
 	// add buttons to change video
 	$.each(videos, function(key) {
-		var button = $('<button/>').text(videos[key].name).click(function() { switchVideo(key); });
+		var button = $('<button/>').text(videos[key].name).click(function() { switchVideo(key, '#resultsDiv'); });
 		$("#videoSelector").append(button);
 	});
 });
@@ -79,8 +79,9 @@ function getUrlParameter(sParam) {
 /**
  * Change the video source and restart
  */
-function switchVideo(n) {
+function switchVideo(n, resultDiv) {
 	var hd = $(document.body).data('hdparams');
+    $(resultDiv).empty().append($("<div class='header'>Image Classification</div>"));
 
 	if (n >= videos.length) n = 0;
 	clearInterval(hd.frameTimer);	// stop the processing
@@ -151,6 +152,9 @@ function doPostImage(srcCanvas, dstDiv) {
 	var dataURL = srcCanvas.toDataURL('image/jpeg', 0.5);
 	var blob = dataURItoBlob(dataURL);
 	var hd = $(document.body).data('hdparams');
+
+    $(dstDiv).append($("<div>&nbsp;</div>").addClass('spinner'));
+
 	var fd = new FormData();
 	if (true) { // hd.serverIsLocal) {
 	    serviceURL = hd.classificationServer;
@@ -202,11 +206,11 @@ function genClassTable (data, div) {
     }
     else {  //expecting flat data
         $.each(data, function(i,v) {
-            if (count < limit && v.predictions >= minScore) {
-                var fade = (v.predictions > 1.0) ? 1 : v.predictions;	// fade out low confidence classes
+            if (count < limit && v.score >= minScore) {
+                var fade = (v.score > 1.0) ? 1 : v.score;	// fade out low confidence classes
                 classTable.append($('<tr />').css('opacity', fade)
-                    .append($('<td />').append(v.classes))
-                    .append($('<td />').append(parseFloat(v.predictions).toFixed(2)))
+                    .append($('<td />').append(v.class))
+                    .append($('<td />').append(parseFloat(v.score).toFixed(2)))
                     );
                 count++;
             }
