@@ -34,10 +34,11 @@ th, td {
   padding: 8px;
 }
 
-th {
+th, .header {
   background-color: #4CAF50;
   color: white;
 }
+
 
 tr:nth-child(even){
   background-color: #f2f2f2
@@ -62,4 +63,12 @@ button {
 .tiny {
     font-size: x-small;
     text-transform: uppercase;
+}
+
+.spinner {
+    background-image: url('spinnerbar.gif');
+    background-size:     contain;
+    background-repeat:   no-repeat;
+    height: 100px;
+    background-position: center center;
 }

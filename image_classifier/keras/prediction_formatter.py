@@ -13,9 +13,9 @@ from sklearn.base import BaseEstimator, ClassifierMixin
 
 class Formatter(BaseEstimator, ClassifierMixin):
     """Format predictions by binding to class names"""
-    COL_NAME_IDX = "idx"
-    COL_NAME_CLASS = "classes"
-    COL_NAME_PREDICTION = "predictions"
+    COL_NAME_IDX = "image"
+    COL_NAME_CLASS = "class"
+    COL_NAME_PREDICTION = "score"
 
     def __init__(self, class_map=None, top_n=30):
         """
