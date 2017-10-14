@@ -41,7 +41,7 @@ $(document).ready(function() {
 
 	//add text input tweak
 	$("#serverUrl").change(function() {
-	    $(document.body).data('hdparams')['classificationServer'] = $(this).val;
+	    $(document.body).data('hdparams')['classificationServer'] = $(this).val();
         updateLink("serverLink");
 	}).val($(document.body).data('hdparams')['classificationServer'])
 	//set launch link at first
@@ -56,8 +56,11 @@ $(document).ready(function() {
 
 function updateLink(domId) {
     var sPageURL = decodeURIComponent(window.location.search.split('?')[0]);
-    console.log(sPageURL);
-    $("#"+domId).attr('href', sPageURL+"?url-image="+$(document.body).data('hdparams')['classificationServer']);
+    var newServer = $(document.body).data('hdparams')['classificationServer'];
+    var sNewUrl = sPageURL+"?url-image="+newServer;
+//    if (typeof(newServer)==string) {
+        $("#"+domId).attr('href', sNewUrl);
+//    }
 }
 
 // https://stackoverflow.com/questions/19491336/get-url-parameter-jquery-or-how-to-get-query-string-values-in-js
