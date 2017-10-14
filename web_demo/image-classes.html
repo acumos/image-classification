@@ -12,7 +12,7 @@ To run from files, and to access local camera, launch chrome from  the command l
 <script type="text/javascript" src="image-classes.js"></script>
 </head>
 <body>
-<img src="header.png">
+<img src="header.png" width="100%" />
 <video class="videoWin" id="srcVideo" muted >
 <source id="mp4" src="video/stock-footage-a-radio-telescope-dish-in-the-very-large-array-reconfigures-to-point-straight-up.mp4" type="video/mp4"></source>
 Your browser does not support the video tag. Please use Chrome.
@@ -20,7 +20,7 @@ Your browser does not support the video tag. Please use Chrome.
 <div id="resultsDiv"><div class='header'>Image Classification</div></div>
 <br/>
 <div id='videoSelector'></div>
-<form>
+<form action="javascript:void(0);">
     <label for="serverUrl">Transform URL:</label><input type="text" name="serverUrl" id="serverUrl" size="60" />
     <br /><span class="tiny"><strong>PRO TIP:</strong>Add the query parameter <em><a href="." id="serverLink">url-image</a></em> to auto-load this URL.</span>
 </form>
