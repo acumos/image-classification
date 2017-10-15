@@ -22,25 +22,25 @@ The optional HTTP parameter `rich_output` will generate a more decorated JSON ou
 ```
 [
     {
-        "classes": "Model T",
-        "predictions": 0.9676347970962524,
-        "idx": 0
+        "class": "Model T",
+        "score": 0.9676347970962524,
+        "image": 0
     },
     {
-        "classes": "thresher, thrasher, threshing machine",
-        "predictions": 0.0003279313677921891,
-        "idx": 0
+        "class": "thresher, thrasher, threshing machine",
+        "score": 0.0003279313677921891,
+        "image": 0
     },
     {
-        "classes": "tow truck, tow car, wrecker",
-        "predictions": 0.00028412468964233994,
-        "idx": 0
+        "class": "tow truck, tow car, wrecker",
+        "score": 0.00028412468964233994,
+        "image": 0
     },
     ...
     {
-        "classes": "dragonfly, darning needle, devil's darning needle, sewing needle, snake feeder, snake doctor, mosquito hawk, skeeter hawk",
-        "predictions": 8.805734978523105e-05,
-        "idx": 0
+        "class": "dragonfly, darning needle, devil's darning needle, sewing needle, snake feeder, snake doctor, mosquito hawk, skeeter hawk",
+        "score": 8.805734978523105e-05,
+        "image": 0
     }
 ]
 
@@ -58,18 +58,21 @@ The optional HTTP parameter `rich_output` will generate a more decorated JSON ou
             {
                 "score": 0.9676347970962524,
                 "rank": 0,
-                "class": "Model T"
+                "class": "Model T",
+                "image": 0
             },
             {
                 "score": 0.0003279313677921891,
                 "rank": 1,
-                "class": "thresher, thrasher, threshing machine"
+                "class": "thresher, thrasher, threshing machine",
+                "image": 0
             },
             ...
             {
                 "score": 8.805734978523105e-05,
                 "rank": 29,
-                "class": "dragonfly, darning needle, devil's darning needle, sewing needle, snake feeder, snake doctor, mosquito hawk, skeeter hawk"
+                "class": "dragonfly, darning needle, devil's darning needle, sewing needle, snake feeder, snake doctor, mosquito hawk, skeeter hawk",
+                "image": 0
             }
         ],
         "serverfilename": "/dev/null",
