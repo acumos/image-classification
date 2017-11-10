@@ -57,6 +57,12 @@ Example for training a model that will return the top 100 classifier scores.
 ./bin/run_local.sh -m model.h5 -f keras -l data/keras_class_names.txt -n 100 -d model -i data/elephant.jpg
 ```
 
+Example for training a model and pushing that model that returns all scores.
+```
+./bin/run_local.sh -m model.h5 -f keras -l data/keras_class_names.txt -n 0 -i data/elephant.jpg -a "http://localhost:8887/v2/upload" -A "http://localhost:8887/v2/auth"
+```
+
+
 Example for evaluation of a test image with top 5 results.
 ```
 ./bin/run_local.sh -m model.h5 -i data/model-t.jpg -f keras -l data/keras_class_names.txt -n 5
@@ -83,6 +89,6 @@ patterns.*
 
 # Example Interface
 An instance should first be built and downloaded from Cognita and then
-launched locally.  Afterwards, the sample application found in 
+launched locally.  Afterwards, the sample application found in
 [web_demo](web_demo) uses a `localhost` service to classify
 and visualize the results of image classification.
