@@ -15,27 +15,19 @@ from os.path import exists
 class Predictor(BaseEstimator, TransformerMixin):
     """Transform predictor, a shell around a keras model"""
 
-    def __init__(self, model_path, weights='imagenet', include_top=True):
+    def __init__(self, model=None, path_model=None, weights='imagenet', include_top=True):
         self.weights = weights
         self.include_top = include_top
-        self.model_path = model_path
-        self.model = None
-
-    def keras_model_(self, model_data):
-        if model_data is None:
-            if self.model is None:
-                self.load_model()
-            model_return = self.model
-            self.model = None
-            return model_return
-        self.model = model_data
+        self.model = model
+        if path_model is not None:
+            self.load_model(path_model)
 
     def get_params(self, deep=False):
         # attempt to save model
         return {
             'weights': self.weights,
             'include_top': self.include_top,
-            'model_path': self.model_path}
+            'model': self.model}
 
     def fit(self, x, y=None):
         # TODO: possibly hook into training process for underlying model, save model
@@ -43,9 +35,9 @@ class Predictor(BaseEstimator, TransformerMixin):
 
     def transform(self, X):
         """
-        Assumes a numpy array for a single image        
+        Assumes a numpy array for a single image
         """
-        if type(X)==pd.DataFrame:
+        if type(X) == pd.DataFrame:
             X = X.as_matrix()
         if not self.model:
             self.load_model()
@@ -54,40 +46,35 @@ class Predictor(BaseEstimator, TransformerMixin):
 
         np_evaluate_set = None
         for image_idx in range(len(X)):
-            image_feat = X[image_idx,:]
+            image_feat = X[image_idx, :]
             np_evaluate = self.model.predict(image_feat)
             if np_evaluate_set is None:  # create an NP container for all image samples + features
-                np_evaluate_set = np.empty((len(X),)+np_evaluate.shape)
+                np_evaluate_set = np.empty((len(X),) + np_evaluate.shape)
             np_evaluate_set[image_idx] = np_evaluate
         return np_evaluate_set
 
-
-
-    def load_model(self):
+    def load_model(self, model_path):
         # default to just 'model.h5' for keras
-        if not self.model_path:
-            self.model_path = 'model.h5'
+        if not model_path:
+            model_path = 'model.h5'
         if self.model is not None:
-            print("Warning: The internal model was valid, skipping load attempt from '{:}'.".format(self.model_path))
+            print("Warning: The internal model was valid, skipping load attempt from '{:}'.".format(model_path))
             return
 
         # note: this should not be needed with a runtime/trained model
         from image_classifier.keras import inception_v4
 
         # Create model and load pre-trained weights
-        model_path = self.model_path
-        if not self.model_path or not exists(self.model_path):
+        if not model_path or not exists(model_path):
             print("Warning: The target model '{:}' was not found, attempting to download archived library.".format(
-                self.model_path))
+                model_path))
             model_path = None
         self.model, model_path = inception_v4.create_model(weights=self.weights, include_top=self.include_top, model_path=model_path)
 
         # if we downlaoded a model, move it to model_path
-        if model_path!=self.model_path and exists(model_path):
-            import shutil
-            shutil.move(model_path, self.model_path)  # move into directory
-
-
+        # if model_path!=model_path and exists(model_path):
+        #    import shutil
+        #    shutil.move(model_path, self.model_path)  # move into directory
 
 
 def main():
@@ -108,7 +95,7 @@ def main():
 
     # Run prediction on test image
     preds = model.predict(img)
-    print("Class is: " + classes[np.argmax(preds)-1])
+    print("Class is: " + classes[np.argmax(preds) - 1])
     print("Certainty is: " + str(preds[0][np.argmax(preds)]))
 
 
