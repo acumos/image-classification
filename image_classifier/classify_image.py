@@ -39,7 +39,7 @@ def model_create_pipeline(path_model, path_label, top_n):
     #       acumos-based wrapper functionality
     pipeline = Pipeline([
         ('decode', ImageDecoder()),
-        ('predict', Predictor(path_model)),
+        ('predict', Predictor(path_model=path_model)),
         ('format', Formatter(dict_classes, top_n))
     ])
 
