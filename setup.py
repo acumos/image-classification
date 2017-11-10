@@ -11,22 +11,22 @@ with open(os.path.join(setup_dir, 'image_classifier', '_version.py')) as file:
 
 
 setup(
-    name = "image_classifier",
-    version = __version__,
-    packages = find_packages(),
-    author = "Eric Zavesky",
-    author_email = "ezavesky@research.att.com",
-    description = ("Image classification tool for whole-frame object and scene classification"),
-    long_description = ("Image classification tool for whole-frame object and scene classification"),
-    license = "Apache",
-    package_data={'image_classification':['data/*']},
+    name="image_classifier",
+    version=__version__,
+    packages=find_packages(),
+    author="Eric Zavesky",
+    author_email="ezavesky@research.att.com",
+    description=("Image classification tool for whole-frame object and scene classification"),
+    long_description=("Image classification tool for whole-frame object and scene classification"),
+    license="Apache",
+    package_data={'image_classification': ['data/*']},
     scripts=['bin/run_image-classifier_reference.py'],
     setup_requires=['pytest-runner'],
     entry_points="""
     [console_scripts]
     """,
-    #setup_requires=['pytest-runner'],
-    install_requires=['cognita_client',
+    # setup_requires=['pytest-runner'],
+    install_requires=['acumos',
                       'numpy',
                       'pillow',
                       'sklearn',
@@ -36,4 +36,4 @@ setup(
     tests_require=['pytest',
                    'pexpect'],
     include_package_data=True,
-    )
+)
