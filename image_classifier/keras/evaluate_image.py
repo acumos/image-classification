@@ -1,7 +1,7 @@
 #! python
 # -*- coding: utf-8 -*-
 """
-Sci-kit wrapper for fit/predict estimator
+Scikit wrapper for fit/predict estimator
 """
 
 from __future__ import print_function
