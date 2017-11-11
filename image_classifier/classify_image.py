@@ -44,7 +44,7 @@ def model_create_pipeline(path_model, path_label, top_n):
     ])
 
     # no other pipeline steps required here...
-    ImageRow = create_namedtuple('ImageInput', [('mime_type', str), ('binary_stream', bytes)])
+    ImageRow = create_namedtuple('ImageInput', [('mime_type', str), ('image_binary', bytes)])
     # represents a collection of flattened image arrays
     ImageSet = create_namedtuple('ImageSet', [('images', List[ImageRow])])
     # output of clasifier, list of tags
@@ -110,7 +110,6 @@ def keras_evaluate(config):
                 X = create_sample(curImage)
                 print("Attempting classification of image [{:}]: {:}...".format(idx, curImage))
                 predNew = model.classify.inner(X)
-                print(predNew)
                 predNew[Formatter.COL_NAME_IDX] = idx
                 if preds is None:
                     preds = predNew

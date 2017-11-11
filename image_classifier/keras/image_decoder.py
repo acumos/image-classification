@@ -11,11 +11,10 @@ from sklearn.base import BaseEstimator, TransformerMixin
 
 # utility for handling string as a file object (prefer python3)
 from io import BytesIO as StringIO
-
-import keras
 from keras.preprocessing import image as image_utils
 
 from image_classifier.keras import inception_v4
+
 
 def image_channels_first():
     from keras import backend as K
@@ -25,7 +24,7 @@ def image_channels_first():
 class ImageDecoder(BaseEstimator, TransformerMixin):
     """Using keras methods decode an image from a mime type and a binary string"""
 
-    DEFAULT_IMAGE_SIZE = (299,299,3)
+    DEFAULT_IMAGE_SIZE = (299, 299, 3)
 
     def fit(self, x, y=None):
         return self
@@ -33,16 +32,21 @@ class ImageDecoder(BaseEstimator, TransformerMixin):
     def transform(self, X):
         """
         Assumes a numpy array of [[mime_type, binary_string] ... ]
-           where mime_type is an image-specifying mime type and binary_string is the raw image bytes       
+           where mime_type is an image-specifying mime type and binary_string is the raw image bytes
         """
         if type(X) == pd.DataFrame:
             X = X.as_matrix()
         np_decode_set = None
         for image_idx in range(len(X)):
-            image_set = X[image_idx,:]
-            np_decode = ImageDecoder.get_processed_image_keras_string(image_set[1])
+            if type(X) == pd.DataFrame:
+                image_tuple = X[image_idx, :]
+            else:  # a list or other tuple-like type
+                image_tuple = X[image_idx]
+            if type(image_tuple) == pd.DataFrame:  # drop type to np matrix
+                image_tuple = image_tuple.as_matrix()[0]
+            np_decode = ImageDecoder.get_processed_image_keras_string(image_tuple[1])
             if np_decode_set is None:  # create an NP container for all image samples + features
-                np_decode_set = np.empty((len(X),)+np_decode.shape)
+                np_decode_set = np.empty((len(X),) + np_decode.shape)
             np_decode_set[image_idx] = np_decode
         return np_decode_set
 
@@ -75,7 +79,6 @@ class ImageDecoder(BaseEstimator, TransformerMixin):
             return image
 
         img_shape = image.shape
-        depth = img_shape[2]
         fraction_offset = int(1 / ((1 - central_fraction) / 2.0))
         bbox_h_start = int(np.divide(img_shape[0], fraction_offset))
         bbox_w_start = int(np.divide(img_shape[1], fraction_offset))
@@ -109,7 +112,6 @@ class ImageDecoder(BaseEstimator, TransformerMixin):
         # TODO: test with other methods like binary string input; currently not used, included as legacy
         print("Warning: get_processed_image_skimage has not been tested for pipeline-based processing")
         from skimage.io import imread
-        from skimage.transform import resize
 
         im = imread(img_path, (target_size[0], target_size[1]))
         # Load image and convert from BGR to RGB
@@ -128,9 +130,9 @@ class ImageDecoder(BaseEstimator, TransformerMixin):
         """
         Read an image from disk, but just return an open file pointer
             (see PIL functionality for this trick - http://pillow.readthedocs.io/en/3.1.x/reference/Image.html)
-        :param img_path: path to image 
+        :param img_path: path to image
         :param target_size: desired size -- should be class default
-        :return: 
+        :return:
         """
         return ImageDecoder.get_processed_image_keras(open(img_path, 'rb'), target_size=target_size)
 
@@ -139,9 +141,9 @@ class ImageDecoder(BaseEstimator, TransformerMixin):
         """
         Read an image from disk, but just return an open file pointer
             (see PIL functionality for this trick - http://pillow.readthedocs.io/en/3.1.x/reference/Image.html)
-        :param binary_string: raw binary string used for parsing 
+        :param binary_string: raw binary string used for parsing
         :param target_size: desired size -- should be class default
-        :return: 
+        :return:
         """
         in_memory = StringIO(binary_string)
         return ImageDecoder.get_processed_image_keras(in_memory, target_size=target_size)
