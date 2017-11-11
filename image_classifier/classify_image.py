@@ -46,7 +46,7 @@ def model_create_pipeline(path_model, path_label, top_n):
     # no other pipeline steps required here...
     ImageRow = create_namedtuple('ImageInput', [('mime_type', str), ('image_binary', bytes)])
     # represents a collection of flattened image arrays
-    ImageSet = create_namedtuple('ImageSet', [('images', List[ImageRow])])
+    ImageSet = List[ImageRow]
     # output of clasifier, list of tags
     ImageTag = create_namedtuple('ImageTag', [('image', int), ('tag', str), ("score", float)])
 
