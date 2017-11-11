@@ -3,12 +3,12 @@
 
  Videos or camera are displayed locally and frames are periodically sent to GPU image-net classifier service (developed by Zhu Liu) via http post.
  For webRTC, See: https://gist.github.com/greenido/6238800
- 
+
  D. Gibbon 6/3/15
  D. Gibbon 4/19/17 updated to new getUserMedia api, https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia
  D. Gibbon 8/1/17 adapted for Cognita
  */
- 
+
 "use strict";
 
 /**
@@ -17,7 +17,7 @@
 $(document).ready(function() {
     var urlDefault = getUrlParameter('url-image');
     if (!urlDefault)
-        urlDefault = "http://localhost:8885/transform";
+        urlDefault = "http://localhost:8885/classify";
 
 	$(document.body).data('hdparams', {	// store global vars in the body element
 		classificationServerFirewallRoot: "http://135.207.105.218:8100",   // Renders HTML for file upload
@@ -32,7 +32,7 @@ $(document).ready(function() {
 		imageIsWaiting: false,  // blocking to prevent too many queued frames
 		// Objects from DOM elements
 		video: document.getElementById('srcVideo'),
-		srcImgCanvas: document.getElementById('srcImgCanvas'),	// we have a 'src' source image 
+		srcImgCanvas: document.getElementById('srcImgCanvas'),	// we have a 'src' source image
 	});
 
 	var hd = $(document.body).data('hdparams');
@@ -129,7 +129,7 @@ function newVideo() {
 	hd.frameTimer = setInterval(nextFrame, hd.frameInterval); // start the processing
 }
 
-/** 
+/**
  * process the next video frame
  */
 function nextFrame() {
@@ -196,11 +196,11 @@ function genClassTable (data, div) {
 				);
 
     if ('results' in data) {
-        $.each(data.results.classes, function(k, v) {
+        $.each(data.results.tags, function(k, v) {
             if (count < limit && v.score >= minScore) {
                 var fade = (v.score > 1.0) ? 1 : v.score;	// fade out low confidence classes
                 classTable.append($('<tr />').css('opacity', fade)
-                    .append($('<td />').append(v.class))
+                    .append($('<td />').append(v.tag))
                     .append($('<td />').append(parseFloat(v.score).toFixed(2)))
                     );
                 count++;
@@ -212,7 +212,7 @@ function genClassTable (data, div) {
             if (count < limit && v.score >= minScore) {
                 var fade = (v.score > 1.0) ? 1 : v.score;	// fade out low confidence classes
                 classTable.append($('<tr />').css('opacity', fade)
-                    .append($('<td />').append(v.class))
+                    .append($('<td />').append(v.tag))
                     .append($('<td />').append(parseFloat(v.score).toFixed(2)))
                     );
                 count++;

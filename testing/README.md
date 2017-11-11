@@ -3,15 +3,16 @@ This directory provides a simple web server for demonstrating an image-based cla
 This web demo will launch an application with a swagger page.
 
 ## Example usage
+This usage will launch an application (a simple Flask-based HTTP server) that
+loads and services model requests.
 
 ```
-$ python app.py
-usage: app.py [-h] [--port PORT] [--modeldir MODELDIR] [--rich_return]
+usage: app.py [-h] [--port PORT] [--modeldir MODELDIR]
 
 optional arguments:
   -h, --help           show this help message and exit
   --port PORT          port to launch the simple web server
-  --modeldir MODELDIR  model directory to load dumped artifact
+  --modeldir MODELDIR  model dir to load dumped artifact
 ```
 
 ### Output formats
@@ -22,23 +23,23 @@ The optional HTTP parameter `rich_output` will generate a more decorated JSON ou
 ```
 [
     {
-        "class": "Model T",
+        "tag": "Model T",
         "score": 0.9676347970962524,
         "image": 0
     },
     {
-        "class": "thresher, thrasher, threshing machine",
+        "tag": "thresher, thrasher, threshing machine",
         "score": 0.0003279313677921891,
         "image": 0
     },
     {
-        "class": "tow truck, tow car, wrecker",
+        "tag": "tow truck, tow car, wrecker",
         "score": 0.00028412468964233994,
         "image": 0
     },
     ...
     {
-        "class": "dragonfly, darning needle, devil's darning needle, sewing needle, snake feeder, snake doctor, mosquito hawk, skeeter hawk",
+        "tag": "dragonfly, darning needle, devil's darning needle, sewing needle, snake feeder, snake doctor, mosquito hawk, skeeter hawk",
         "score": 8.805734978523105e-05,
         "image": 0
     }
@@ -58,20 +59,20 @@ The optional HTTP parameter `rich_output` will generate a more decorated JSON ou
             {
                 "score": 0.9676347970962524,
                 "rank": 0,
-                "class": "Model T",
+                "tag": "Model T",
                 "image": 0
             },
             {
                 "score": 0.0003279313677921891,
                 "rank": 1,
-                "class": "thresher, thrasher, threshing machine",
+                "tag": "thresher, thrasher, threshing machine",
                 "image": 0
             },
             ...
             {
                 "score": 8.805734978523105e-05,
                 "rank": 29,
-                "class": "dragonfly, darning needle, devil's darning needle, sewing needle, snake feeder, snake doctor, mosquito hawk, skeeter hawk",
+                "tag": "dragonfly, darning needle, devil's darning needle, sewing needle, snake feeder, snake doctor, mosquito hawk, skeeter hawk",
                 "image": 0
             }
         ],
@@ -86,5 +87,5 @@ The optional HTTP parameter `rich_output` will generate a more decorated JSON ou
 * Additionally, a simple command-line utility could be used to post an image
 and mime type to the main interface.
 ```
-curl -F image_binary=@test.jpg -F rich_output="true" -F mime_type="image/jpeg" "http://localhost:8885/transform"
+curl -F image_binary=@test.jpg -F rich_output="true" -F mime_type="image/jpeg" "http://localhost:8885/classify"
 ```
