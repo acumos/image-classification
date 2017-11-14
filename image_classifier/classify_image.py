@@ -111,7 +111,7 @@ def keras_evaluate(config):
                 curImage = listImages[idx]
                 X = create_sample(curImage)
                 print("Attempting classification of image [{:}]: {:}...".format(idx, curImage))
-                predNew = model.classify.inner(X)
+                predNew = pd.DataFrame(model.classify.inner(X))
                 predNew[Formatter.COL_NAME_IDX] = idx
                 if preds is None:
                     preds = predNew
