@@ -50,8 +50,13 @@ def model_create_pipeline(path_model, path_label, top_n):
     # output of clasifier, list of tags
     ImageTag = create_namedtuple('ImageTag', [('image', int), ('tag', str), ("score", float)])
 
-    def predict_class(df: ImageSet) -> List[ImageTag]:
+    def predict_class(value: ImageSet) -> List[ImageTag]:
         '''Returns an array of float predictions'''
+        # NOTE: we don't have a named output type, so need to match 'value' to proto output
+        if type(value) == pd.DataFrame:
+            df = value
+        else:
+            df = pd.DataFrame(value)
         tags_df = pipeline.predict(df)
         tags_list = [ImageTag(*row) for row in tags_df.values]  # iterate over rows and unpack row into ImageTag
         return tags_list
