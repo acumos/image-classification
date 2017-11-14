@@ -52,7 +52,9 @@ def model_create_pipeline(path_model, path_label, top_n):
 
     def predict_class(df: ImageSet) -> List[ImageTag]:
         '''Returns an array of float predictions'''
-        return pipeline.predict(df)
+        tags_df = pipeline.predict(df)
+        tags_list = [ImageTag(*row) for row in tags_df.values]  # iterate over rows and unpack row into ImageTag
+        return tags_list
 
     # compute path of this package to add it as a dependency
     package_path = path.dirname(path.realpath(__file__))
