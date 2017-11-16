@@ -43,22 +43,26 @@ def model_create_pipeline(path_model, path_label, top_n):
         ('format', Formatter(dict_classes, top_n))
     ])
 
-    # no other pipeline steps required here...
-    ImageRow = create_namedtuple('ImageInput', [('mime_type', str), ('image_binary', bytes)])
-    # represents a collection of flattened image arrays
-    ImageSet = List[ImageRow]
+    # create a dataframe and image set
+    # ImageSet = create_dataframe("ImageSet", ImageDecoder.generate_input_dataframe())
+    # TODO: replace with more friendly dataframe operation when it supoprts strings...
+    df = ImageDecoder.generate_input_dataframe()
+    image_type = tuple(zip(df.columns, [List[t] for t in ImageDecoder.generate_input_types()]))
+    ImageSet = create_namedtuple("ImageSet", image_type)
     # output of clasifier, list of tags
-    ImageTag = create_namedtuple('ImageTag', [('image', int), ('tag', str), ("score", float)])
+    df = Formatter.generate_output_dataframe()
+    tag_type = tuple(zip(df.columns, [List[t] for t in Formatter.generate_output_types()]))
+    ImageTagSet = create_namedtuple("ImageTagSet", tag_type)
 
-    def predict_class(value: ImageSet) -> List[ImageTag]:
+    def predict_class(value: ImageSet) -> ImageTagSet:
         '''Returns an array of float predictions'''
         # NOTE: we don't have a named output type, so need to match 'value' to proto output
         if type(value) == pd.DataFrame:
             df = value
         else:
-            df = pd.DataFrame(value)
+            df = pd.DataFrame(np.column_stack(value), columns=value._fields)
         tags_df = pipeline.predict(df)
-        tags_list = [ImageTag(*row) for row in tags_df.values]  # iterate over rows and unpack row into ImageTag
+        tags_list = ImageTagSet(*(col for col in tags_df.values.T))  # flatten to tag set
         return tags_list
 
     # compute path of this package to add it as a dependency
@@ -66,11 +70,11 @@ def model_create_pipeline(path_model, path_label, top_n):
     return Model(classify=predict_class), Requirements(packages=[package_path], reqs=[pd, np, 'keras', 'tensorflow'])
 
 
-def create_sample(path_image):
+def create_sample(path_image, input_type="image/jpeg"):
+    from image_classifier.keras.image_decoder import ImageDecoder
     # munge stream and mimetype into input sample
     binStream = open(path_image, 'rb').read()
-    X = pd.DataFrame([['image/jpeg', binStream]], columns=['mime_type', 'binary_stream'])
-    return X
+    return ImageDecoder.generate_input_dataframe(input_type, binStream)
 
 
 def keras_evaluate(config):
@@ -108,21 +112,40 @@ def keras_evaluate(config):
             taskComplete = True
 
         preds = None
-        if not taskComplete:
+        if not taskComplete:   # means we need to run a prediction/classify
+            import tempfile
+            from acumos.session import _dump_model, _copy_dir
+            from os.path import join as path_join
+            from acumos.wrapped import load_model
+
             if not listImages:
                 listImages = [config['image']]
             preds = None
-            for idx in range(len(listImages)):
-                curImage = listImages[idx]
-                X = create_sample(curImage)
-                print("Attempting classification of image [{:}]: {:}...".format(idx, curImage))
-                predNew = pd.DataFrame(model.classify.inner(X))
-                predNew[Formatter.COL_NAME_IDX] = idx
-                if preds is None:
-                    preds = predNew
-                else:
-                    preds = preds.append(predNew, ignore_index=True)
-            preds.reset_index(drop=True, inplace=True)
+
+            # temporarily wrap model to a temp directory (to get 'wrapped' functionality)
+            with tempfile.TemporaryDirectory() as tdir:   # create temp dir
+                with _dump_model(model, MODEL_NAME, reqs) as dump_dir:  # dump model to temp dir
+                    _copy_dir(dump_dir, tdir, MODEL_NAME)   # relocate for load_model below
+
+                model_dir = path_join(tdir, MODEL_NAME)
+                wrapped_model = load_model(model_dir)  # load to wrapped model
+                type_in = wrapped_model.classify._input_type
+
+                for idx in range(len(listImages)):
+                    curImage = listImages[idx]
+                    print("Attempting classification of image [{:}]: {:}...".format(idx, curImage))
+
+                    X = create_sample(curImage)
+                    classify_in = type_in(*tuple(col for col in X.values.T))
+                    pred_raw = wrapped_model.classify.from_wrapped(classify_in).as_wrapped()
+                    # already a wrapped response
+                    predNew = pd.DataFrame(np.column_stack(pred_raw), columns=pred_raw._fields)
+                    predNew[Formatter.COL_NAME_IDX] = idx
+                    if preds is None:
+                        preds = predNew
+                    else:
+                        preds = preds.append(predNew, ignore_index=True)
+                preds.reset_index(drop=True, inplace=True)
 
     """
     Disable non-sklearn path for now
