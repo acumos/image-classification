@@ -8,6 +8,7 @@ import time
 
 from flask import current_app, make_response
 import pandas as pd
+import numpy as np
 
 from acumos.wrapped import load_model
 
@@ -19,11 +20,15 @@ def classify(mime_type, image_binary, rich_output=False):
     image_read = image_binary.stream.read()
     X = pd.DataFrame([['image/jpeg', image_read]], columns=['mime_type', 'image_binary'])
     method = app.model.classify
-    pred_rows = method.from_native(X).as_wrapped()
+    # pred_raw = method.from_native(X).as_wrapped()   # alternate method once library is reevaluated
+
+    type_in = method._input_type
+    classify_in = type_in(*tuple(col for col in X.values.T))
+    pred_raw = method.from_wrapped(classify_in).as_wrapped()
+
+    pred = pd.DataFrame(np.column_stack(pred_raw), columns=pred_raw._fields)
     time_stop = time.clock()
 
-    # for now, we just pop the first (because we just expect one image output)
-    pred = pd.DataFrame(pred_rows[0])
     if rich_output:
         # NOTE: This response is specially formatted for the webdemo included with this package.
         #       Alternate forms of a response are viable for any other desired application.
@@ -38,7 +43,7 @@ def classify(mime_type, image_binary, rich_output=False):
 
         # iterate through predictions
         pred['rank'] = list(pred.index)
-        pred['rank'] = pred['rank']+1
+        pred['rank'] = pred['rank'] + 1
         retObj['tags'] = pred.to_dict(orient='records')
 
         # dump to pretty JSON
