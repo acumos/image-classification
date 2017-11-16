@@ -6,7 +6,6 @@ Simple scikit-based transformer for transforming numpy predictions into a datafr
 
 from __future__ import print_function
 
-import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator, ClassifierMixin
 
@@ -31,6 +30,15 @@ class Formatter(BaseEstimator, ClassifierMixin):
         return {'class_map': self.class_map,
                 'top_n': self.top_n}
 
+    @staticmethod
+    def generate_output_dataframe(tag_idx=0, tag_class="", tag_score=0.0):
+        return pd.DataFrame([[tag_idx, tag_class, tag_score]],
+                            columns=[Formatter.COL_NAME_IDX, Formatter.COL_NAME_CLASS, Formatter.COL_NAME_PREDICTION])
+
+    @staticmethod
+    def generate_output_types():
+        return [int, str, float]
+
     @property
     def output_types_(self):
         _types = self.classes_
@@ -42,18 +50,18 @@ class Formatter(BaseEstimator, ClassifierMixin):
 
     @property
     def classes_(self):
-        return [int, str, float]
+        return Formatter.generate_output_types()
 
     def fit(self, x, y=None):
         return self
 
     def predict(self, X, y=None):
-        if type(X)==pd.DataFrame:
+        if type(X) == pd.DataFrame:
             X = X.as_matrix()
 
         df_predict_set = None
         for image_idx in range(len(X)):
-            np_predict = X[image_idx,:]
+            np_predict = X[image_idx, :]
             if self.class_list is None:  # may need to init from map one time
                 num_class = np_predict.shape[1]
                 self.class_list = Formatter.prediction_list_gen(self.class_map, range(num_class))
@@ -95,6 +103,6 @@ class Formatter(BaseEstimator, ClassifierMixin):
             class_list = Formatter.prediction_list_gen(dict_classes, list(df.index))
         df.insert(0, Formatter.COL_NAME_CLASS, class_list)
 
-        #print("Class is: " + classes[np.argmax(preds) - 1])
+        # print("Class is: " + classes[np.argmax(preds) - 1])
         df.sort_values([Formatter.COL_NAME_PREDICTION], ascending=False, inplace=True)
         return df

@@ -25,9 +25,20 @@ class ImageDecoder(BaseEstimator, TransformerMixin):
     """Using keras methods decode an image from a mime type and a binary string"""
 
     DEFAULT_IMAGE_SIZE = (299, 299, 3)
+    IMAGE_INPUT_MIME = "mime_type"
+    IMAGE_INPUT_BINARY = "image_binary"
 
     def fit(self, x, y=None):
         return self
+
+    @staticmethod
+    def generate_input_types():
+        return [str, bytes]
+
+    @staticmethod
+    def generate_input_dataframe(mime_type="", image_bytes=b""):
+        return pd.DataFrame([[mime_type, image_bytes]],
+                            columns=[ImageDecoder.IMAGE_INPUT_MIME, ImageDecoder.IMAGE_INPUT_BINARY])
 
     def transform(self, X):
         """
