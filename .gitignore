@@ -104,3 +104,6 @@ ENV/
 # Rope project settings
 .ropeproject
 
+# Platform oobjects
+**/.DS_Store
+
