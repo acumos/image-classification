@@ -18,3 +18,6 @@
 ### 0.4.0
 * Migration from previous library structure to new acumos client library
 * Refactor to not need **this** library as a runtime/installed dependency
+
+## 0.3
+* Added example for evaluation of a multiple image with all results, saving predictions.
