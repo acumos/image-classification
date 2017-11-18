@@ -1,10 +1,10 @@
-# Swagger API
+# Application Server
 As a means of testing the API and demonstrating functionality, two
 additional components are included in this repository:
 a simple [swagger-based webserver](../../testing) (documented here) and
 a [demo web page](../../web_demo) (documented in the [next tutorial](lesson3.md).
 
-# Swagger API
+## Swagger API
 Using a simple [flask-based connexion server](https://github.com/zalando/connexion),
 an API scaffold has been built to host a serialized/dumped model.
 
@@ -31,19 +31,6 @@ in the main repo source directory.
 python app.py --modeldir ../model --port 8885
 ```
 
-
-## Example usage
-This usage will launch an application (a simple Flask-based HTTP server) that
-loads and services model requests.
-
-```
-usage: app.py [-h] [--port PORT] [--modeldir MODELDIR]
-
-optional arguments:
-  -h, --help           show this help message and exit
-  --port PORT          port to launch the simple web server
-  --modeldir MODELDIR  model dir to load dumped artifact
-```
 
 ### Output formats
 The optional HTTP parameter `rich_output` will generate a more decorated JSON output
