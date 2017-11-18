@@ -28,4 +28,4 @@ classificationServer: "http://localhost:8885/classify",
 * view the page `image-classes.html` in a Crome or Firefox browser (sorry other browsers may not properly serve the HTML5 video tag)
 * probabilities will be updated on the right side fo the screen
 * you can switch between a few sample videos by clicking on the buttons below the main video player
-* ![example web application classifying tigers video](example_running.jpg "Example web application classifying tigers video")
+* ![example web application classifying tigers video](../../web_demo/example_running.jpg "Example web application classifying tigers video")
