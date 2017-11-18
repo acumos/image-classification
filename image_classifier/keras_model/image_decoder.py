@@ -11,9 +11,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 
 # utility for handling string as a file object (prefer python3)
 from io import BytesIO as StringIO
-from keras.preprocessing import image as image_utils
-
-from image_classifier.keras import inception_v4
+from image_classifier.keras_model import inception_v4
 
 
 def image_channels_first():
@@ -60,8 +58,6 @@ class ImageDecoder(BaseEstimator, TransformerMixin):
                 np_decode_set = np.empty((len(X),) + np_decode.shape)
             np_decode_set[image_idx] = np_decode
         return np_decode_set
-
-    from keras.preprocessing import image as image_utils
 
     # This function comes from Google's ImageNet Preprocessing Script
     @staticmethod
@@ -161,6 +157,7 @@ class ImageDecoder(BaseEstimator, TransformerMixin):
 
     @staticmethod
     def get_processed_image_keras(file_object, target_size=DEFAULT_IMAGE_SIZE):
+        from keras.preprocessing import image as image_utils
         image = image_utils.load_img(file_object, target_size=target_size)
         image = image_utils.img_to_array(image)
 

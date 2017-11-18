@@ -62,7 +62,7 @@ class Predictor(BaseEstimator, TransformerMixin):
             return
 
         # note: this should not be needed with a runtime/trained model
-        from image_classifier.keras import inception_v4
+        from image_classifier.keras_model import inception_v4
 
         # Create model and load pre-trained weights
         if not model_path or not exists(model_path):
