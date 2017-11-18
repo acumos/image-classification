@@ -15,9 +15,10 @@ MODEL_NAME = 'image_classifier'
 
 def model_create_pipeline(path_model, path_label, top_n):
     from sklearn.pipeline import Pipeline
-    from image_classifier.keras.prediction_formatter import Formatter
-    from image_classifier.keras.evaluate_image import Predictor
-    from image_classifier.keras.image_decoder import ImageDecoder
+    import keras
+    from image_classifier.keras_model.prediction_formatter import Formatter
+    from image_classifier.keras_model.evaluate_image import Predictor
+    from image_classifier.keras_model.image_decoder import ImageDecoder
     from acumos.modeling import Model, List, create_namedtuple
     from acumos.session import Requirements
     from os import path
@@ -64,11 +65,11 @@ def model_create_pipeline(path_model, path_label, top_n):
 
     # compute path of this package to add it as a dependency
     package_path = path.dirname(path.realpath(__file__))
-    return Model(classify=predict_class), Requirements(packages=[package_path], reqs=[pd, np, 'keras', 'tensorflow'])
+    return Model(classify=predict_class), Requirements(packages=[package_path], reqs=[pd, np, keras, 'tensorflow'])
 
 
 def create_sample(path_image, input_type="image/jpeg"):
-    from image_classifier.keras.image_decoder import ImageDecoder
+    from image_classifier.keras_model.image_decoder import ImageDecoder
     # munge stream and mimetype into input sample
     binStream = open(path_image, 'rb').read()
     return ImageDecoder.generate_input_dataframe(input_type, binStream)
@@ -87,7 +88,7 @@ def keras_evaluate(config):
 
     if useSklearn:
         # formulate the pipelien to be used
-        from image_classifier.keras.prediction_formatter import Formatter
+        from image_classifier.keras_model.prediction_formatter import Formatter
         model, reqs = model_create_pipeline(config['model_path'], config['label_path'],
                                             config['num_top_predictions'])
 
@@ -201,4 +202,8 @@ def main(config={}):
 
 
 if __name__ == '__main__':
+    # patch the path to include this object
+    pathRoot = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    if pathRoot not in sys.path:
+        sys.path.append(pathRoot)
     main()

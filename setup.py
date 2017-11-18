@@ -19,8 +19,8 @@ setup(
     description=("Image classification tool for whole-frame object and scene classification"),
     long_description=("Image classification tool for whole-frame object and scene classification"),
     license="Apache",
-    package_data={'image_classification': ['data/*']},
-    scripts=['bin/run_image-classifier_reference.py'],
+    # package_data={'image_classification': ['data/*']},
+    # scripts=['bin/run_image-classifier_reference.py'],
     setup_requires=['pytest-runner'],
     entry_points="""
     [console_scripts]

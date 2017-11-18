@@ -35,7 +35,7 @@ def preprocess_input(x):
 def conv2d_bn(x, nb_filter, num_row, num_col,
               padding='same', strides=(1, 1), use_bias=False):
     """
-    Utility function to apply conv + BN. 
+    Utility function to apply conv + BN.
     (Slightly modified from https://github.com/fchollet/keras/blob/master/keras/applications/inception_v3.py)
     """
     if K.image_data_format() == 'channels_first':
@@ -231,8 +231,8 @@ def inception_v4(num_classes, dropout_keep_prob, weights, include_top, weights_p
     Args:
         num_classes: number of classes
         dropout_keep_prob: float, the fraction to keep before final layer.
-    
-    Returns: 
+
+    Returns:
         logits: the logits outputs of the model.
     '''
 
