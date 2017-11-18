@@ -1,8 +1,8 @@
-# An API and Web Demo
+# Swagger API
 As a means of testing the API and demonstrating functionality, two
 additional components are included in this repository:
-a simple [swagger-based webserver](../../testing) and
-a [demo web page](../../web_demo).
+a simple [swagger-based webserver](../../testing) (documented here) and
+a [demo web page](../../web_demo) (documented in the [next tutorial](lesson3.md).
 
 # Swagger API
 Using a simple [flask-based connexion server](https://github.com/zalando/connexion),
