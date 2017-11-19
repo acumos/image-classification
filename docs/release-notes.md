@@ -1,5 +1,9 @@
 # Release Notes
 ## 0.4
+### 0.4.5
+* Documentation and package update to use install instructions instead of installing
+  this package directly into a user's environment.
+
 ### 0.4.4
 * Refactor to remote the demo `bin` scripts and rewire for direct call of the
   script `classify_image.py` as the primary interaction mechanism.
