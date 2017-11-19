@@ -10,6 +10,22 @@ It closely follows the [image classification example](https://tensorflow.org/tut
 provided as part of the tensorflow documentation.
 At time of writing, this sample does not support retraining.
 
+
+### Package dependencies
+Package dependencies for the core code and testing have been flattened into a
+single file for convenience. Instead of installing this package into your
+your local environment, execute the command below.
+
+```
+pip install -r requirments.txt
+```
+
+**Note:** If you are using an [anaconda-based environment](https://anaconda.org),
+you may want to try
+installing these packages [directly](https://docs.anaconda.com/anaconda-repository/user-guide/tasks/pkgs/download-install-pkg).
+to avoid mixing of `pip` and `conda` package stores.
+
+
 ### Usage
 This package contains runable scripts for command-line evaluation,
 packaging of a model (both dump and posting), and simple web-test
