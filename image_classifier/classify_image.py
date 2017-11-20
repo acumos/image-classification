@@ -202,6 +202,7 @@ def main(config={}):
 
 
 if __name__ == '__main__':
+    import os, sys
     # patch the path to include this object
     pathRoot = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     if pathRoot not in sys.path:
