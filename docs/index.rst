@@ -4,6 +4,6 @@ image-classification
 .. toctree::
        :maxdepth: 2
     
-       image-classification
-       release-notes
+       image-classification.md
+       release-notes.md
        tutorials/index                  
