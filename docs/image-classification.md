@@ -19,6 +19,10 @@ your local environment, execute the command below.
 ```
 pip install -r requirments.txt
 ```
+or, if you want ot install dependencies with a package place holder...
+```
+pip install .
+```
 
 **Note:** If you are using an [anaconda-based environment](https://anaconda.org),
 you may want to try

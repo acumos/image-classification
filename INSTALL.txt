@@ -1,0 +1,7 @@
+*****************************************************************************
+    WARNING: Local installation of this package is not supported. This
+             package consolidates only the required package dependencies. 
+
+    Please utilize the `acumos` client library to deploy this library.
+    Use the 'requirements.txt' file to check for install dependencies.
+*****************************************************************************
