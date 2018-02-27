@@ -1,10 +1,14 @@
 # requirements for deployment AND testing
 
 # core deployment packages
-acumos
+# acumos -- for now skip because non-public
 numpy
 pillow
 scipy
 sklearn
 keras
 tensorflow
+
+# testing packages
+connexion
+pytest
