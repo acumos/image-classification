@@ -43,4 +43,3 @@ var videos = [
 	  'name': 'dog'
 	}
 ];
-
