@@ -18,11 +18,15 @@
 .. ===============LICENSE_END=========================================================
 -->
 
+
+
 # Application Server
 As a means of testing the API and demonstrating functionality, two
 additional components are included in this repository:
 a simple [swagger-based webserver](../../testing) (documented here) and
 a [demo web page](../../web_demo) (documented in the [next tutorial](lesson3.md).
+
+
 
 ## Swagger API
 Using a simple [flask-based connexion server](https://github.com/zalando/connexion),
@@ -127,4 +131,21 @@ and mime type to the main interface.
 ```
 curl -F image_binary=@test.jpg -F rich_output="true" -F mime_type="image/jpeg" "http://localhost:8885/classify"
 ```
+
+
+# Direct use of the model-runner
+
+One simple testing mode is to simulate the output of an Acumos model runner.
+This model runner can be locally duplicated by using the primary python library
+`acumos-python-client`.  This execution usage is experimental, but the APIs should
+be consistent for use.
+
+```
+python acumos-python-client/testing/wrap/runner.py  --port 8885 --modeldir model/
+```
+
+The above command uses the testing-based model runner to launch a singular model
+that responds on a single port in native `protobuf` format.
+
+
 

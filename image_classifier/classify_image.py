@@ -74,7 +74,7 @@ def model_create_pipeline(path_model, path_label, top_n):
     def predict_class(wrapped_imageset: ImageSet) -> ImageTagSet:
         '''Returns an array of float predictions'''
         # NOTE: we don't have a named output type, so need to match 'value' to proto output
-        df = pd.DataFrame(np.column_stack(wrapped_imageset), columns=wrapped_imageset._fields)
+        df = pd.DataFrame(list(zip(*wrapped_imageset)), columns=wrapped_imageset._fields)
         tags_df = pipeline.predict(df)
         tags_list = ImageTagSet(*(col for col in tags_df.values.T))  # flatten to tag set
         return tags_list

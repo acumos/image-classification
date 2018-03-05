@@ -9,9 +9,9 @@
   under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
- 
+
   http://www.apache.org/licenses/LICENSE-2.0
- 
+
   This file is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
@@ -27,8 +27,10 @@ To run from files, and to access local camera, launch chrome from  the command l
 <title>Image Classification</title>
 <link rel="stylesheet" type="text/css" href="image-classes.css" />
 <script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="protobuf/protobuf.min.js"></script>
 <script type="text/javascript" src="video-list.js"></script>
 <script type="text/javascript" src="image-classes.js"></script>
+<script type="text/javascript" src="video-list.js"></script>
 </head>
 <body>
 <video class="videoWin" id="srcVideo" muted >
@@ -38,9 +40,20 @@ Your browser does not support the video tag. Please use Chrome.
 <div id="resultsDiv"><div class='header'>Image Classification</div></div>
 <br/>
 <div id='videoSelector'></div>
+<hr />
 <form action="javascript:void(0);">
-    <label for="serverUrl">Transform URL:</label><input type="text" name="serverUrl" id="serverUrl" size="60" />
-    <br /><span class="tiny"><strong>PRO TIP:</strong>Add the query parameter <em><a href="." id="serverLink">url-image</a></em> to auto-load this URL.</span>
+<table class="tableConfig">
+    <tr><td><label for="serverUrl">Transform URL:</label></td>
+        <td><input type="text" name="serverUrl" id="serverUrl" size="60" />
+        <br /><span class="tiny"><em>Note: The endpoint url may be modified when a new method below is utilized.</em></span></td></tr>
+    <tr><td><label for="protoMethod">Protobuf Method:</label></td>
+        <td><select name="protoMethod" id="protoMethod" ><option value="">(disabled, not loaded)</option></select></td></tr>
+    <tr><td><label for="protoButton">Protobuf Message:</label></td>
+        <td><button type="button" name="protoInput" id="protoInput" >Download Encoded Input</button> -
+        <button type="button" name="protoOutput" id="protoOutput" >Download Encoded Response</button></td></tr>
+    <tr><td><span class="tiny"><strong>PRO TIP:</strong></span></td>
+        <td><span class="tiny">Add the query parameter <em><a href="." id="serverLink">url-image</a></em> to auto-load this URL.</span></td></tr>
+</table>
 </form>
 <div id='refline' style='width:900'>
 <br/>Image classification using deep convolutional neural nets (CNNs) and the
@@ -55,7 +68,7 @@ The dataset consists of <a href="http://image-net.org/challenges/LSVRC/2014/brow
 <br/>
 <br/>
 <a href='http://www.research.att.com/projects/Video/'>Video and Multimedia Technologies Research</a>
-<canvas id="srcImgCanvas" width="480" height="270" style="visibility:hidden"></canvas>
 </div>
+<canvas id="srcImgCanvas" width="480" height="270" style="visibility:hidden;position:absolute;top:0;left:0"></canvas>
 </body>
 </html>

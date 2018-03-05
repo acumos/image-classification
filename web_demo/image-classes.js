@@ -8,9 +8,9 @@
   under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
- 
+
   http://www.apache.org/licenses/LICENSE-2.0
- 
+
   This file is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
@@ -42,6 +42,9 @@ $(document).ready(function() {
 		classificationServerFirewallRoot: "http://135.207.105.218:8100",   // Renders HTML for file upload
 		classificationServerFirewall: "http://135.207.105.218:8100/upload",
 		classificationServer: urlDefault,
+		protoObj: null,   // to be back-filled after protobuf load {'root':obj, 'methods':{'xx':{'typeIn':x, 'typeOut':y}} }
+		protoPayloadInput: null,   //payload for encoded message download (if desired)
+		protoPayloadOutput: null,   //payload for encoded message download (if desired)
 		frameCounter: 0,
 		totalFrames: 900000,	// stop after this many frames just to avoid sending frames forever if someone leaves page up
 		frameInterval: 500,		// Milliseconds to sleep between sending frames to reduce server load and reduce results updates
@@ -58,6 +61,11 @@ $(document).ready(function() {
 	//$('#serviceLink').attr("href", hd.classificationServerFirewallRoot);
 	hd.video.addEventListener("loadedmetadata", newVideo);
 
+    $("#protoInput").prop("disabled",true).click(downloadBlobIn);
+    $("#protoOutput").prop("disabled",true).click(downloadBlobOut);
+    $("#resultText").hide();
+
+
 	//add text input tweak
 	$("#serverUrl").change(function() {
 	    $(document.body).data('hdparams')['classificationServer'] = $(this).val();
@@ -66,12 +74,57 @@ $(document).ready(function() {
 	//set launch link at first
     updateLink("serverLink");
 
+    //if protobuf is enabled, fire load event for it as well
+    $(document.body).data('hdparams').protoObj = {};  //clear from last load
+    protobuf_load("model.proto", true);
+
 	// add buttons to change video
 	$.each(videos, function(key) {
 		var button = $('<button/>').text(videos[key].name).click(function() { switchVideo(key, '#resultsDiv'); });
 		$("#videoSelector").append(button);
 	});
 });
+
+
+function protobuf_load(pathProto, forceSelect) {
+    protobuf.load(pathProto, function(err, root) {
+        if (err) {
+            console.log("[protobuf]: Error!: "+err);
+            throw err;
+        }
+        var domSelect = $("#protoMethod");
+        var numMethods = domSelect.children().length;
+        $.each(root.nested, function(namePackage, objPackage) {    // walk all
+            if ('Model' in objPackage && 'methods' in objPackage.Model) {    // walk to model and functions...
+                var typeSummary = {'root':root, 'methods':{} };
+                $.each(objPackage.Model.methods, function(nameMethod, objMethod) {  // walk methods
+                    typeSummary['methods'][nameMethod] = {};
+                    typeSummary['methods'][nameMethod]['typeIn'] = namePackage+'.'+objMethod.requestType;
+                    typeSummary['methods'][nameMethod]['typeOut'] = namePackage+'.'+objMethod.responseType;
+                    typeSummary['methods'][nameMethod]['service'] = namePackage+'.'+nameMethod;
+
+                    //create HTML object as well
+                    var namePretty = namePackage+"."+nameMethod;
+                    var domOpt = $("<option />").attr("value", namePretty).text(
+                        nameMethod+ " (input: "+objMethod.requestType
+                        +", output: "+objMethod.responseType+")");
+                    if (numMethods==0) {    // first method discovery
+                        domSelect.append($("<option />").attr("value","").text("(disabled, not loaded)")); //add 'disabled'
+                    }
+                    if (forceSelect) {
+                        domOpt.attr("selected", 1);
+                    }
+                    domSelect.append(domOpt);
+                    numMethods++;
+                });
+                $(document.body).data('hdparams').protoObj[namePackage] = typeSummary;   //save new method set
+                $("#protoContainer").show();
+            }
+        });
+        console.log("[protobuf]: Load successful, found "+numMethods+" model methods.");
+    });
+}
+
 
 function updateLink(domId) {
     var sPageURL = decodeURIComponent(window.location.search.split('?')[0]);
@@ -166,40 +219,123 @@ function nextFrame() {
     }
 }
 
+
+
+
 /**
  * post an image from the canvas to the service
  */
-function doPostImage(srcCanvas, dstDiv) {
-	var serviceURL = "";
-	var dataURL = srcCanvas.toDataURL('image/jpeg', 0.5);
-	var blob = dataURItoBlob(dataURL);
-	var hd = $(document.body).data('hdparams');
+function doPostImage(srcCanvas, dstDiv,) {
+    var dataURL = srcCanvas.toDataURL('image/jpeg', 1.0);
+    var hd = $(document.body).data('hdparams');
+    var sendPayload = null;
+
+    var nameProtoMethod = $("#protoMethod option:selected").attr('value');
+    var methodKeys = null;
+    if (nameProtoMethod && nameProtoMethod.length) {     //valid protobuf type?
+        var partsURL = hd.classificationServer.split("/");
+        methodKeys = nameProtoMethod.split(".", 2);       //modified for multiple detect/pixelate models
+        partsURL[partsURL.length-1] = methodKeys[1];
+        hd.classificationServer = partsURL.join("/");   //rejoin with new endpoint
+        updateLink("serverLink", hd.classificationServer);
+    }
+
+    var serviceURL = hd.classificationServer;
+    var request = new XMLHttpRequest();     // create request to manipulate
+
+    request.open("POST", serviceURL, true);
+    hd.imageIsWaiting = true;
 
     $(dstDiv).append($("<div>&nbsp;</div>").addClass('spinner'));
 
-	var fd = new FormData();
-	if (true) { // hd.serverIsLocal) {
-	    serviceURL = hd.classificationServer;
-        fd.append("image_binary", blob);
-        fd.append("mime_type", "image/jpeg");
+    //console.log("[doPostImage]: Selected method ... '"+typeInput+"'");
+    if (nameProtoMethod && nameProtoMethod.length) {     //valid protobuf type?
+        var blob = dataURItoBlob(dataURL, true);
+
+        // fields from .proto file at time of writing...
+        //   message ImageSet {
+        //     repeated string mime_type = 1;
+        //     repeated bytes image_binary = 2;
+        //   }
+
+        //TODO: should we always assume this is input? answer: for now, YES, always image input!
+        var inputPayload = { "mimeType": [blob.type], "imageBinary": [blob.bytes] };
+
+        // ---- method for processing from a type ----
+        var msgInput = hd.protoObj[methodKeys[0]]['root'].lookupType(hd.protoObj[methodKeys[0]]['methods'][methodKeys[1]]['typeIn']);
+        // Verify the payload if necessary (i.e. when possibly incomplete or invalid)
+        var errMsg = msgInput.verify(inputPayload);
+        if (errMsg) {
+            console.log("[doPostImage]: Error during type verify for object input into protobuf method.");
+            throw Error(errMsg);
+        }
+        // Create a new message
+        var msgTransmit = msgInput.create(inputPayload);
+        // Encode a message to an Uint8Array (browser) or Buffer (node)
+        sendPayload = msgInput.encode(msgTransmit).finish();
+
+        //downloadBlob(sendPayload, 'protobuf.bin', 'application/octet-stream');
+        // NOTE: TO TEST THIS BINARY BLOB, use some command-line magic like this...
+        //  protoc --decode=mMJuVapnmIbrHlZGKyuuPDXsrkzpGqcr.FaceImage model.proto < protobuf.bin
+        $("#protoInput").prop("disabled",false);
+        hd.protoPayloadInput = sendPayload;
+
+        //request.setRequestHeader("Content-type", "application/octet-stream;charset=UTF-8");
+        request.setRequestHeader("Content-type", "text/plain;charset=UTF-8");
+        request.responseType = 'arraybuffer';
+    }
+    else {
+        var blob = dataURItoBlob(dataURL, false);
+        sendPayload = new FormData();
+        if (true) { // hd.serverIsLocal) {
+            serviceURL = hd.classificationServer;
+            sendPayload.append("image_binary", blob);
+            sendPayload.append("mime_type", blob.type);
+        }
+        else {      //disabled now for direct URL specification
+            serviceURL = hd.classificationServerFirewall;
+            sendPayload.append("myFile", blob);
+            sendPayload.append("rtnformat", "json");
+            sendPayload.append("myList", "5");	// limit the number of classes (max 1000)
+        }
+    }
+
+    //$(dstImg).addClaas('workingImage').siblings('.spinner').remove().after($("<span class='spinner'>&nbsp;</span>"));
+
+    request.onreadystatechange=function() {
+        if (request.readyState==4 && request.status>=200 && request.status<300) {
+            if (methodKeys!=null) {     //valid protobuf type?
+                var bodyEncodedInString = new Uint8Array(request.response);
+                $("#protoOutput").prop("disabled",false);
+                hd.protoPayloadOutput = bodyEncodedInString;
+
+                // ---- method for processing from a type ----
+                var msgOutput = hd.protoObj[methodKeys[0]]['root'].lookupType(hd.protoObj[methodKeys[0]]['methods'][methodKeys[1]]['typeOut']);
+                var objRecv = msgOutput.decode(hd.protoPayloadOutput);
+                var objRefactor = [];       // what we pass to gen table
+                //console.log(msgOutput);
+                $.each(msgOutput.fields, function(name,val) {
+                    var needCreate = (objRefactor.length == 0);
+                    for (var i=0; i<objRecv[name].length; i++) {
+                        if (needCreate) {
+                            objRefactor.push({});
+                        }
+                        objRefactor[i][name] = objRecv[name][i];
+                    }
+                });
+                //console.log(objRefactor);
+                genClassTable(objRefactor, dstDiv);
+            }
+            else {
+                var objRecv = $.parseJSON(request.responseText);
+                genClassTable(objRecv, dstDiv);
+            }
+            hd.imageIsWaiting = false;
+        }
 	}
-	else {      //disabled now for direct URL specification
-	    serviceURL = hd.classificationServerFirewall;
-        fd.append("myFile", blob);
-        fd.append("rtnformat", "json");
-        fd.append("myList", "5");	// limit the number of classes (max 1000)
-	}
-	var request = new XMLHttpRequest();
-	hd.imageIsWaiting = true;
-	request.onreadystatechange=function() {
-		if (request.readyState==4 && request.status==200) {
-			genClassTable($.parseJSON(request.responseText), dstDiv);
-			hd.imageIsWaiting = false;
-		}
-	}
-	request.open("POST", serviceURL, true);
-	request.send(fd);
+	request.send(sendPayload);
 }
+
 
 /**
  * create markup for a list of classifications
@@ -242,12 +378,13 @@ function genClassTable (data, div) {
 	$(div).append(classTable);
 }
 
+
 /**
  * convert base64/URLEncoded data component to raw binary data held in a string
  *
  * Stoive, http://stackoverflow.com/questions/4998908/convert-data-uri-to-file-then-append-to-formdata
  */
-function dataURItoBlob(dataURI) {
+function dataURItoBlob(dataURI, wantBytes) {
     // convert base64/URLEncoded data component to raw binary data held in a string
     var byteString;
     if (dataURI.split(',')[0].indexOf('base64') >= 0)
@@ -263,6 +400,61 @@ function dataURItoBlob(dataURI) {
     for (var i = 0; i < byteString.length; i++) {
         ia[i] = byteString.charCodeAt(i);
     }
-
+    //added for returning bytes directly
+    if (wantBytes) {
+        return {'bytes':ia, 'type':mimeString};
+    }
     return new Blob([ia], {type:mimeString});
 }
+
+function Uint8ToString(u8a){
+  var CHUNK_SZ = 0x8000;
+  var c = [];
+  for (var i=0; i < u8a.length; i+=CHUNK_SZ) {
+    c.push(String.fromCharCode.apply(null, u8a.subarray(i, i+CHUNK_SZ)));
+  }
+  return c.join("");
+}
+
+
+// ----- diagnostic tool to download binary blobs ----
+function downloadBlobOut() {
+    return downloadBlob($(document.body).data('hdparams').protoPayloadOutput, "protobuf.out.bin");
+}
+
+function downloadBlobIn() {
+    return downloadBlob($(document.body).data('hdparams').protoPayloadInput, "protobuf.in.bin");
+}
+
+//  https://stackoverflow.com/a/33622881
+function downloadBlob(data, fileName, mimeType) {
+  //if there is no data, filename, or mime provided, make our own
+  if (!data)
+      data = $(document.body).data('hdparams').protoPayloadInput;
+  if (!fileName)
+      fileName = "protobuf.bin";
+  if (!mimeType)
+      mimeType = "application/octet-stream";
+
+  var blob, url;
+  blob = new Blob([data], {
+    type: mimeType
+  });
+  url = window.URL.createObjectURL(blob);
+  downloadURL(url, fileName, mimeType);
+  setTimeout(function() {
+    return window.URL.revokeObjectURL(url);
+  }, 1000);
+};
+
+function downloadURL(data, fileName) {
+  var a;
+  a = document.createElement('a');
+  a.href = data;
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.style = 'display: none';
+  a.click();
+  a.remove();
+};
+
