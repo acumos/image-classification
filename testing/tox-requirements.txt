@@ -8,7 +8,7 @@ scipy
 pandas
 sklearn
 keras
-tensorflow
+tensorflow<1.6.0
 
 # testing packages
 connexion
