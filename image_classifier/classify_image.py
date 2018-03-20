@@ -81,7 +81,7 @@ def model_create_pipeline(path_model, path_label, top_n):
 
     # compute path of this package to add it as a dependency
     package_path = path.dirname(path.realpath(__file__))
-    return Model(classify=predict_class), Requirements(packages=[package_path], reqs=[pd, np, keras, 'tensorflow'])
+    return Model(classify=predict_class), Requirements(packages=[package_path], reqs=[pd, np, keras, 'tensorflow', 'Pillow'])
 
 
 def create_sample(path_image, input_type="image/jpeg"):
