@@ -30,6 +30,10 @@ it to disk or by pushing it to an onboarding server.  Please consult the
 [reference manual](../image-classification.md#usage) for more specific arguments
 but the examples below demonstrate basic capabilities.
 
+* [elephant.jpg](https://www.pexels.com/photo/animal-big-ear-elephant-133393/)
+* [panda.jpg](https://www.pexels.com/photo/red-panda-eating-green-leaf-on-tree-branch-during-daytime-146033/)
+
+
 Example for training a model that will return the top 100 classifier scores.
 ```
 python image_classifier/classify_image.py -m model.h5 -f keras -l data/keras_class_names.txt -n 100 -d model -i data/elephant.jpg
@@ -44,6 +48,8 @@ python image_classifier/classify_image.py -m model.h5 -f keras -l data/keras_cla
 In-place evaluation will not utilize a serialized version of the model and will
 instead wrap it in memory and use it in-place.  This mode is handy for quick
 evaluation of images or image sets for use in other classifiers.
+
+* [model-t.jpg](https://www.pexels.com/photo/aged-antique-automobile-automotive-208582/)
 
 Example for evaluation of a test image with top 5 results.
 ```

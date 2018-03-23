@@ -20,6 +20,7 @@
 /**
 video-list.js - list of videos to select for processing
 David Gibbon 1/10/14, 8/1/17
+Eric Zavesky 3/23/18 video switch-up, add attribution
 
 Format is video URL, name to show up in UI, and (optional) frame rate (frames per second, default 15)
 Note that cross origin may prohibit external URLs
@@ -30,35 +31,33 @@ var videos = [
 	//  'name': 'Camera'
 	//},
 	{
-	  'url': 'video/stock-footage-a-radio-telescope-dish-in-the-very-large-array-reconfigures-to-point-straight-up.mp4', 
-	  'name': 'uplink'
+	  'url': 'video/stock-footage-city-cars.mp4',
+	  'source': 'https://videos.pexels.com/videos/cars-on-the-road-854745',
+	  'name': 'city-cars'
 	},
 	{
-	  'url': 'video/stock-footage-sailboat-with-snorkelers.mp4', 
-	  'name': 'catamaran'
+	  'url': 'video/stock-footage-bicycles.mp4',
+	  'source': 'https://videos.pexels.com/videos/mountain-bikers-during-daytime-857083',
+	  'name': 'bikes'
 	},
 	{
-	  'url': 'video/stock-footage-couple-at-beach-with-tandem-bicycle.mp4', 
-	  'name': 'tandem'
+	  'url': 'video/stock-footage-coast-time.mp4',
+      'source': 'https://videos.pexels.com/videos/sunset-by-the-sea-857056',
+	  'name': 'costal-lapse'
 	},
 	{
-	  'url': 'video/stock-footage-canada-circa-transport-trucks-on-highway.mp4', 
-	  'name': 'trucks'
-	},
-	{
-	  'url': 'video/stock-footage-tigers-fight-game-play-tigers-are-fighting-in-a-wild-biting-its-body-and-neck-fight-for-dominate.mp4', 
-	  'name': 'tigers'
-	},
-	{
-	  'url': 'video/stock-footage-red-squirrel-at-the-chestnut-close-portrait.mp4', 
+	  'url': 'video/stock-footage-squirrel.mp4',
+      'source': 'https://videos.pexels.com/videos/squirrel-eating-855213',
 	  'name': 'squirrel'
 	},
 	{
-	  'url': 'video/stock-footage-yawning-gray-fox.mp4', 
-	  'name': 'gray fox'
+	  'url': 'video/stock-footage-dogs.mp4',
+      'source': 'https://videos.pexels.com/videos/dogs-playing-853846',
+	  'name': 'park-dogs'
 	},
 	{
-	  'url': 'video/stock-footage-beagle-in-an-autumn-park.mp4', 
-	  'name': 'dog'
-	}
+	  'url': 'video/stock-footage-scuba.mp4',
+      'source': 'https://videos.pexels.com/videos/paddle-surfing-and-scuba-diving-video-854387',
+	  'name': 'scuba'
+	},
 ];

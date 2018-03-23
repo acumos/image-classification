@@ -8,9 +8,9 @@
   under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
- 
+
   http://www.apache.org/licenses/LICENSE-2.0
- 
+
   This file is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
@@ -79,9 +79,14 @@ $(document).ready(function() {
     protobuf_load("model.proto", true);
 
 	// add buttons to change video
+	var populatedFirst = false;
 	$.each(videos, function(key) {
-		var button = $('<button/>').text(videos[key].name).click(function() { switchVideo(key, '#resultsDiv'); });
+		var button = $('<button/>').text(videos[key].name).click(function() { switchVideo(key, '#resultsDiv', '#videoSourceSite'); });
 		$("#videoSelector").append(button);
+		if (!populatedFirst) {    //select first video
+        		switchVideo(key, '#resultsDiv', '#videoSourceSite');
+        		populatedFirst = true;
+		}
 	});
 });
 
@@ -154,7 +159,7 @@ function getUrlParameter(sParam) {
 /**
  * Change the video source and restart
  */
-function switchVideo(n, resultDiv) {
+function switchVideo(n, resultDiv, attrDiv) {
 	var hd = $(document.body).data('hdparams');
     $(resultDiv).empty().append($("<div class='header'>Image Classification</div>"));
 
@@ -172,9 +177,14 @@ function switchVideo(n, resultDiv) {
 			.catch(function(err) {
 				console.log(err.name + ": " + err.message);
 			});
+        $(attrDiv).empty();
 	} else {
 		var mp4 = document.getElementById("mp4");
 		mp4.setAttribute("src", videos[n].url);
+         $(attrDiv).empty();
+         if (videos[n].source != undefined) {
+             $(attrDiv).append($("<a href='"+videos[n].source+"' target='_new'>Video Source: "+videos[n].name+"</a>"));
+         }
 		hd.video.load();
 	}
 }
