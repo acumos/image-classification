@@ -15,3 +15,33 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ============LICENSE_END=========================================================
+
+The following media files are included in this repo for demo purposes and are
+licensed and sourced as described:
+
+image-classification/data/cropped_panda.jpg
+- CC0 license. Source: https://pixabay.com/en/animal-branch-cute-leaves-outdoors-1852789/
+
+image-classification/data/elephant.jpg
+- CC0 license. Source: https://pixabay.com/en/animals-elephant-nature-wild-zoo-908439/
+
+image-classification/data/model-t.jpg
+- CC0 license. Source: https://www.pexels.com/photo/aged-antique-automobile-automotive-208582/
+
+image-classification/web_demo/video/stock-footage-bicycles.mp4
+- CC0 license. Source: https://videos.pexels.com/videos/mountain-bikers-during-daytime-857083
+
+image-classification/web_demo/video/stock-footage-city-cars.mp4
+- CC0 license. Source: https://videos.pexels.com/videos/cars-on-the-road-854745
+
+image-classification/web_demo/video/stock-footage-coast-time.mp4
+- CC0 license. Source: https://videos.pexels.com/videos/sunset-by-the-sea-857056
+
+image-classification/web_demo/video/stock-footage-dogs.mp4
+- CC0 license. https://videos.pexels.com/videos/dogs-playing-853846
+
+image-classification/web_demo/video/stock-footage-scuba.mp4
+- CC0 license. https://videos.pexels.com/videos/paddle-surfing-and-scuba-diving-video-854387
+
+image-classification/web_demo/video/stock-footage-squirrel.mp4
+- CC0 license. Source: https://videos.pexels.com/videos/squirrel-eating-855213
