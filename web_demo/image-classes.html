@@ -9,9 +9,9 @@
   under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
- 
+
   http://www.apache.org/licenses/LICENSE-2.0
- 
+
   This file is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
@@ -34,11 +34,13 @@ To run from files, and to access local camera, launch chrome from  the command l
 </head>
 <body>
 <video class="videoWin" id="srcVideo" muted >
-<source id="mp4" src="video/stock-footage-a-radio-telescope-dish-in-the-very-large-array-reconfigures-to-point-straight-up.mp4" type="video/mp4"></source>
+<source id="mp4" src="video/unknown.mp4" type="video/mp4"></source>
 Your browser does not support the video tag. Please use Chrome.
 </video>
 <div id="resultsDiv"><div class='header'>Image Classification</div></div>
 <br/>
+<div id='videoSourceSite'></div>
+<hr />
 <div id='videoSelector'></div>
 <hr />
 <form action="javascript:void(0);">
@@ -67,7 +69,7 @@ The dataset consists of <a href="http://image-net.org/challenges/LSVRC/2014/brow
 -->
 <br/>
 <br/>
-<a href='http://www.research.att.com/projects/Video/'>Video and Multimedia Technologies Research</a>
+<a href='http://www.research.att.com/sites/labs_research/video_media_analytics'>Video and Multimedia Technologies Research</a>
 </div>
 <canvas id="srcImgCanvas" width="480" height="270" style="visibility:hidden;position:absolute;top:0;left:0"></canvas>
 </body>

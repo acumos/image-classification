@@ -20,6 +20,9 @@
 
 # Release Notes
 ## 0.4
+### 0.4.6
+* Update image examples for open-source video.
+
 ### 0.4.5
 * Documentation and package update to use install instructions instead of installing
   this package directly into a user's environment.
