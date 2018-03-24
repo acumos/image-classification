@@ -18,7 +18,7 @@
 .. ===============LICENSE_END=========================================================
 -->
 
-# image-classification
+# Image Classification Guide
 A model example for image classification within Acumos.
 
 ## Image Classification Keras Use-case (Acumos)

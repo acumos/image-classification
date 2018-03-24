@@ -15,12 +15,14 @@
 .. See the License for the specific language governing permissions and
 .. limitations under the License.
 .. ===============LICENSE_END=========================================================
-image-classification
---------------------
-    
+
+====================
+Image Classification
+====================
+
 .. toctree::
        :maxdepth: 2
-    
-       image-classification
+
        release-notes
-       tutorials/index                  
+       image-classification
+       tutorials/index

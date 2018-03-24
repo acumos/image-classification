@@ -18,7 +18,7 @@
 .. ===============LICENSE_END=========================================================
 -->
 
-# Release Notes
+# Image Classification Release Notes
 ## 0.4
 ### 0.4.6
 * Update image examples for open-source video.
