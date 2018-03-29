@@ -19,19 +19,53 @@
 -->
 
 # Image Classification Guide
-A model example for image classification within Acumos.
+A model example for image classification with a Keras wrapper within Acumos.
 
-## Image Classification Keras Use-case (Acumos)
-This source code creates and pushes a model into Acumos that processes
-incoming images and outputs a number of classification probability values.
-This model utilizes the pretrained network from [keras inception v4](https://github.com/kentsommer/keras-inceptionV4)
-and utilizes the [pretrained keras model](https://github.com/kentsommer/keras-inceptionV4/releases).
-It closely follows the [image classification example](https://tensorflow.org/tutorials/image_recognition/)
-provided as part of the tensorflow documentation.
-At time of writing, this sample does not support retraining.
+## Background
+This model analyzes static images and produces a probability for a number of
+objects, scene, and activity tags.  It is a Keras-based wrapper around a
+visual model trained for [Inception Net](https://github.com/google/inception)
+and this source code creates and pushes
+a model into Acumos.  This model utilizes the pre-trained network from
+[keras inception v4](https://github.com/kentsommer/keras-inceptionV4)
+and utilizes the
+[pretrained keras model](https://github.com/kentsommer/keras-inceptionV4/releases).
+At time of writing,
+this sample does not support retraining.
 
+## Usage
+Input to the model is an array of one or more tuples of image binary data and
+a binary mime type.  The position of the image within the array is utilized
+in the output signature as a zero-based index.  For example if three images
+were sent, the output probabilities would have 0, 1, and 2 as index values.
+The probabilities are normalized to sum to 1.0 over all values so that they
 
-### Package dependencies
+can utilized as relative confidence scores.
+A web demo is included with the source code, available via the
+[Acumos Gerrit repository](https://gerrit.acumos.org/r/gitweb?p=image-classification.git;a=summary).
+It utilizes a protobuf javascript library and inputs captured frames
+from a few video samples to classify and display the top N detected
+classification scores, as illustrated in the model image.
+
+## Performance
+Formal performance is not provided here because this is a wrapped, pre-generated
+model, but the original authors point to
+[these sources for information](https://github.com/kentsommer/keras-inceptionV4#performance-metrics-top5-top1).
+
+Error rates are actually slightly lower than the listed error rates on
+non-blacklisted subset of ILSVRC2012 Validation Dataset (Single Crop):
+* Top@1 Error: 20.0%
+* Top@5 Error: 5.0%
+
+## More Information
+Enhancements to this model may include additional training capabilities or
+adaptation to new model weights (and classes) when available.
+
+# Source Installation
+This section is useful for source-based installations and is not generally intended
+for catalog documentation.
+
+## Package dependencies
 Package dependencies for the core code and testing have been flattened into a
 single file for convenience. Instead of installing this package into your
 your local environment, execute the command below.
@@ -50,7 +84,7 @@ installing these packages [directly](https://docs.anaconda.com/anaconda-reposito
 to avoid mixing of `pip` and `conda` package stores.
 
 
-### Usage
+## Usage
 This package contains runable scripts for command-line evaluation,
 packaging of a model (both dump and posting), and simple web-test
 uses.   All functionality is encapsulsted in the `classify_image.py`
