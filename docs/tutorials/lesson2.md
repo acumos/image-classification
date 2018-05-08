@@ -24,7 +24,9 @@ additional components are included in this repository:
 a simple [swagger-based webserver](../../testing) (documented here) and
 a [demo web page](../../web_demo) (documented in the [next tutorial](lesson3.md).
 
-
+**NOTE: These steps are now deprecated and a direct protobuf interface from
+web page to the model (the next tutorial) is the preferred operational step.
+*(added v0.4.2)* **
 
 ## Swagger API
 Using a simple [flask-based connexion server](https://github.com/zalando/connexion),

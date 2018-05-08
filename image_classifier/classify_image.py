@@ -64,20 +64,37 @@ def model_create_pipeline(path_model, path_label, top_n):
     # ImageSet = create_dataframe("ImageSet", ImageDecoder.generate_input_dataframe())
     # TODO: replace with more friendly dataframe operation when it supoprts strings...
     df = ImageDecoder.generate_input_dataframe()
-    image_type = tuple(zip(df.columns, [List[t] for t in ImageDecoder.generate_input_types()]))
-    ImageSet = create_namedtuple("ImageSet", image_type)
+    image_type = tuple(zip(df.columns, ImageDecoder.generate_input_types()))
+    name_in = "Image"
+    Image = create_namedtuple(name_in, image_type)
+    name_multiple_in = name_in + "s"
+    input_set = create_namedtuple(name_in + "Set", [(name_multiple_in, List[Image])])
+
     # output of clasifier, list of tags
     df = Formatter.generate_output_dataframe()
-    tag_type = tuple(zip(df.columns, [List[t] for t in Formatter.generate_output_types()]))
-    ImageTagSet = create_namedtuple("ImageTagSet", tag_type)
+    tag_result = tuple(zip(df.columns, Formatter.generate_output_types()))
+    name_out = "ImageTag"
+    ImageTag = create_namedtuple(name_out, tag_result)
+    output_set = create_namedtuple(name_out + "Set", [(name_out + "s", List[ImageTag])])
 
-    def predict_class(wrapped_imageset: ImageSet) -> ImageTagSet:
+    def predict_class(val_wrapped: input_set) -> output_set:
         '''Returns an array of float predictions'''
         # NOTE: we don't have a named output type, so need to match 'value' to proto output
-        df = pd.DataFrame(list(zip(*wrapped_imageset)), columns=wrapped_imageset._fields)
+        # print("-===== input -===== ")
+        # print(input_set)
+        df = pd.DataFrame(getattr(val_wrapped, name_multiple_in), columns=Image._fields)
+        # print("-===== df -===== ")
+        # print(df)
+        # print("-===== out df -===== ")
         tags_df = pipeline.predict(df)
-        tags_list = ImageTagSet(*(col for col in tags_df.values.T))  # flatten to tag set
-        return tags_list
+        # print(tags_df)
+        tags_parts = tags_df.to_dict('split')
+        # print("-===== out list -===== ")
+        # print(output_set)
+        tags_list = [ImageTag(*r) for r in tags_parts['data']]
+        print("[{}]: Input {} row(s) ({}), output {} row(s) ({}))".format(
+              "image_classifier", len(df), input_set, len(tags_df), output_set))
+        return output_set(tags_list)
 
     # compute path of this package to add it as a dependency
     package_path = path.dirname(path.realpath(__file__))
