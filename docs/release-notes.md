@@ -19,6 +19,16 @@
 -->
 
 # Image Classification Release Notes
+## 0.5
+### 0.5.0
+* Documentation (lesson1) updated with model runner examples.  Deprecation notice
+  in using explicit proto- and swagger-based serves.
+* Update the structure of the protobuf input and output to use flattened (row-based)
+  structure instead of columnar data for all i/o channels.  This should allow
+  other inspecting applications to more easily understand and reuse implementations
+  for image data.
+* Update the demonstration HTML pages for similar modifications.
+
 ## 0.4
 ### 0.4.6
 * Update image examples for open-source video.
