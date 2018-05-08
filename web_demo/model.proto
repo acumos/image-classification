@@ -1,17 +1,25 @@
 syntax = "proto3";
-package MkQqqYoJoeivdiNvJPVSnhUlmFzKVten;
+package ZmazgwcYOzRPSlAKlNLcoITKjByZchTo;
 
 service Model {
   rpc classify (ImageSet) returns (ImageTagSet);
 }
 
-message ImageTagSet {
-  repeated int64 image = 1;
-  repeated string tag = 2;
-  repeated double score = 3;
+message ImageSet {
+  repeated Image Images = 1;
 }
 
-message ImageSet {
-  repeated string mime_type = 1;
-  repeated bytes image_binary = 2;
+message Image {
+  string mime_type = 1;
+  bytes image_binary = 2;
+}
+
+message ImageTagSet {
+  repeated ImageTag ImageTags = 1;
+}
+
+message ImageTag {
+  int64 image = 1;
+  string tag = 2;
+  double score = 3;
 }

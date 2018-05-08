@@ -67,7 +67,7 @@ are using the same `.proto` file.
     * confirm the host port and classification service URL in the file `image-classes.js`
     * modify the `protoDefault` setting to be 1
 ```
-urlDefault: "http://localhost:8885/classify",
+urlDefault: "http://localhost:8886/classify",
 ```
 * view the page `image-classes.html` in a Crome or Firefox browser
 * you can switch between a few sample images or upload your own by clicking on the buttons below the main image window
@@ -79,8 +79,8 @@ image or output that was sent to the remote service.  When available, the <stron
 button will be enabled and a binary file will be generated in the browser.
 
 ```
-protoc --decode=MkQqqYoJoeivdiNvJPVSnhUlmFzKVten.ImageTagSet model.proto < protobuf.out.bin
-protoc --decode=MkQqqYoJoeivdiNvJPVSnhUlmFzKVten.ImageSet model.proto < protobuf.in.bin
+protoc --decode=ZmazgwcYOzRPSlAKlNLcoITKjByZchTo.ImageTagSet model.proto < protobuf.out.bin
+protoc --decode=ZmazgwcYOzRPSlAKlNLcoITKjByZchTo.ImageSet model.proto < protobuf.in.bin
 ```
 
 **NOTE** The specific package name may have changed since the time of writing,
@@ -95,7 +95,7 @@ or simply update the primary classification URL on the page itself during runtim
 * download this directory to your local machine
   * confirm the host port and classification service URL in the file `image-classes.js`
 ```
-classificationServer: "http://localhost:8885/classify",
+classificationServer: "http://localhost:8886/classify",
 ```
 * view the page `image-classes.html` in a Crome or Firefox browser (sorry other browsers may not properly serve the HTML5 video tag)
 * probabilities will be updated on the right side fo the screen

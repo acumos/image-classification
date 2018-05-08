@@ -60,3 +60,26 @@ Example for evaluation of a multiple image with all results, saving predictions.
 ```
 python image_classifier/classify_image.py -m model.h5 -I data/image_list.txt -f keras -p data/features.csv -l data/keras_class_names.txt -n 0
 ```
+
+## Using the client model runner
+
+Getting even closer to what it looks like in a deployed model, you can also use
+the model runner code to run classification locally. *(added v0.5.0)*
+
+
+1. First, decide the ports to run your classification and other models. In the example
+below, classiciation runs on port `8886`.
+
+
+2. Second, dump and launch the classification model. If you modify the ports to
+run the models, please change them accordingly.  This command example assumes
+that you have cloned the client library in a relative path of `../acumos-python-client`.
+The first line removes any prior model directory, the second dumps the detect
+model to disk, and the third runs the model.
+
+
+```
+rm -rf model; \
+    python image_classifier/classify_image.py -m model.h5 -f keras -l data/keras_class_names.txt -n 0 -d model -i data/elephant.jpg; \
+    python ../acumos-python-client/testing/wrap/runner.py --port 8886 --modeldir model/image_classifier --no_downstream
+```

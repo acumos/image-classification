@@ -25,7 +25,8 @@
 
  D. Gibbon 6/3/15
  D. Gibbon 4/19/17 updated to new getUserMedia api, https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia
- D. Gibbon 8/1/17 adapted for Cognita
+ D. Gibbon 8/1/17 adapted for system
+ E. Zavesky 05/05/18 adapted for row-based image and other results
  */
 
 "use strict";
@@ -36,7 +37,7 @@
 $(document).ready(function() {
     var urlDefault = getUrlParameter('url-image');
     if (!urlDefault)
-        urlDefault = "http://localhost:8885/classify";
+        urlDefault = "http://localhost:8886/classify";
 
 	$(document.body).data('hdparams', {	// store global vars in the body element
 		classificationServerFirewallRoot: "http://135.207.105.218:8100",   // Renders HTML for file upload
@@ -256,28 +257,35 @@ function doPostImage(srcCanvas, dstDiv,) {
     request.open("POST", serviceURL, true);
     hd.imageIsWaiting = true;
 
-    $(dstDiv).append($("<div>&nbsp;</div>").addClass('spinner'));
+    var domResult = $(dstDiv);
+    domResult.append($("<div>&nbsp;</div>").addClass('spinner'));
 
     //console.log("[doPostImage]: Selected method ... '"+typeInput+"'");
     if (nameProtoMethod && nameProtoMethod.length) {     //valid protobuf type?
         var blob = dataURItoBlob(dataURL, true);
 
         // fields from .proto file at time of writing...
-        //   message ImageSet {
-        //     repeated string mime_type = 1;
-        //     repeated bytes image_binary = 2;
-        //   }
+        // message ImageSet {
+        //   repeated Image Images = 1;
+        // }
+        //
+        // message Image {
+        //   string mime_type = 1;
+        //   bytes image_binary = 2;
+        // }
 
         //TODO: should we always assume this is input? answer: for now, YES, always image input!
-        var inputPayload = { "mimeType": [blob.type], "imageBinary": [blob.bytes] };
+        var inputPayload = {'Images':[{ "mimeType": blob.type, "imageBinary": blob.bytes }]};
 
         // ---- method for processing from a type ----
         var msgInput = hd.protoObj[methodKeys[0]]['root'].lookupType(hd.protoObj[methodKeys[0]]['methods'][methodKeys[1]]['typeIn']);
         // Verify the payload if necessary (i.e. when possibly incomplete or invalid)
         var errMsg = msgInput.verify(inputPayload);
         if (errMsg) {
-            console.log("[doPostImage]: Error during type verify for object input into protobuf method.");
-            throw Error(errMsg);
+            var strErr = "[doPostImage]: Error during type verify for object input into protobuf method. ("+errMsg+")";
+            domResult.empty().html(strErr);
+            console.log(strErr);
+            throw Error(strErr);
         }
         // Create a new message
         var msgTransmit = msgInput.create(inputPayload);
@@ -321,20 +329,40 @@ function doPostImage(srcCanvas, dstDiv,) {
 
                 // ---- method for processing from a type ----
                 var msgOutput = hd.protoObj[methodKeys[0]]['root'].lookupType(hd.protoObj[methodKeys[0]]['methods'][methodKeys[1]]['typeOut']);
-                var objRecv = msgOutput.decode(hd.protoPayloadOutput);
-                var objRefactor = [];       // what we pass to gen table
-                //console.log(msgOutput);
-                $.each(msgOutput.fields, function(name,val) {
-                    var needCreate = (objRefactor.length == 0);
-                    for (var i=0; i<objRecv[name].length; i++) {
-                        if (needCreate) {
-                            objRefactor.push({});
-                        }
-                        objRefactor[i][name] = objRecv[name][i];
+                var objOutput = null;
+                try {
+                    objOutput = msgOutput.decode(hd.protoPayloadOutput);
+                }
+                catch(err) {
+                    var errStr = "Error: Failed to parse protobuf response, was the right method chosen? (err: "+err.message+")";
+                    console.log(errStr);
+                    domResult.html(errStr);
+                    hd.imageIsWaiting = false;
+                    return false;
+                }
+
+                //try to crawl the fields in the protobuf....
+                var numFields = 0;
+                var nameRepeated;
+                $.each(msgOutput.fields, function(name, val) {           //collect field names
+                    if (val.repeated) {     //indicates it's a repeated field (likely an array)
+                        nameRepeated = name;      //save this as last repeated field (ideally there is just one)
                     }
+                    numFields += 1;
                 });
-                //console.log(objRefactor);
-                genClassTable(objRefactor, dstDiv);
+                if (numFields > 1) {
+                    var errStr = "Error: Expected array/repeated structure in response, but got non-flat array result ("+numFields+" fields)";
+                    console.log(errStr);
+                    domResult.html(errStr);
+                    hd.imageIsWaiting = false;
+                    return false;
+                }
+                var objRecv = objOutput[nameRepeated];
+
+                //grab the nested array type and print out the fields of interest
+                //var typeNested = methodKeys[0]+"."+msgOutput.fields[nameRepeated].type;
+                //var msgOutputNested = hd.protoObj[methodKeys[0]]['root'].lookupType(typeNested);
+                genClassTable(objRecv, dstDiv);
             }
             else {
                 var objRecv = $.parseJSON(request.responseText);
