@@ -26,11 +26,6 @@ To run from files, and to access local camera, launch chrome from  the command l
 <head>
 <title>Image Classification</title>
 <link rel="stylesheet" type="text/css" href="image-classes.css" />
-<script type="text/javascript" src="jquery.js"></script>
-<script type="text/javascript" src="protobuf/protobuf.min.js"></script>
-<script type="text/javascript" src="video-list.js"></script>
-<script type="text/javascript" src="image-classes.js"></script>
-<script type="text/javascript" src="video-list.js"></script>
 </head>
 <body>
 <video class="videoWin" id="srcVideo" muted >
@@ -72,5 +67,12 @@ The dataset consists of <a href="http://image-net.org/challenges/LSVRC/2014/brow
 <a href='http://www.research.att.com/sites/labs_research/video_media_analytics'>Video and Machine Learning Research</a>
 </div>
 <canvas id="srcImgCanvas" width="480" height="270" style="visibility:hidden;position:absolute;top:0;left:0"></canvas>
+<!-- delay loading until last minute --->
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="protobuf/protobuf.min.js"></script>
+<script type="text/javascript" src="video-list.js"></script>
+<script type="text/javascript" src="image-classes.js"></script>
+<script type="text/javascript" src="video-list.js"></script>
+<script type="text/javascript" src="jquery-ajax-native.js"></script>
 </body>
 </html>

@@ -251,12 +251,8 @@ function doPostImage(srcCanvas, dstDiv,) {
         updateLink("serverLink", hd.classificationServer);
     }
 
-    var serviceURL = hd.classificationServer;
-    var request = new XMLHttpRequest();     // create request to manipulate
-
-    request.open("POST", serviceURL, true);
     hd.imageIsWaiting = true;
-
+    var domHeaders = {};
     var domResult = $(dstDiv);
     domResult.append($("<div>&nbsp;</div>").addClass('spinner'));
 
@@ -275,7 +271,7 @@ function doPostImage(srcCanvas, dstDiv,) {
         // }
 
         //TODO: should we always assume this is input? answer: for now, YES, always image input!
-        var inputPayload = {'Images':[{ "mimeType": blob.type, "imageBinary": blob.bytes }]};
+        var inputPayload = { "mimeType": blob.type, "imageBinary": blob.bytes };
 
         // ---- method for processing from a type ----
         var msgInput = hd.protoObj[methodKeys[0]]['root'].lookupType(hd.protoObj[methodKeys[0]]['methods'][methodKeys[1]]['typeIn']);
@@ -299,8 +295,8 @@ function doPostImage(srcCanvas, dstDiv,) {
         hd.protoPayloadInput = sendPayload;
 
         //request.setRequestHeader("Content-type", "application/octet-stream;charset=UTF-8");
-        request.setRequestHeader("Content-type", "text/plain;charset=UTF-8");
-        request.responseType = 'arraybuffer';
+        domHeaders["Content-type"] = "text/plain;charset=UTF-8";
+        //request.responseType = 'arraybuffer';
     }
     else {
         var blob = dataURItoBlob(dataURL, false);
@@ -319,13 +315,34 @@ function doPostImage(srcCanvas, dstDiv,) {
     }
 
     //$(dstImg).addClaas('workingImage').siblings('.spinner').remove().after($("<span class='spinner'>&nbsp;</span>"));
-
-    request.onreadystatechange=function() {
-        if (request.readyState==4 && request.status>=200 && request.status<300) {
+    $.ajax({
+        type: 'POST',
+        url: hd.classificationServer,
+        data: sendPayload,
+        crossDomain: true,
+        dataType: 'native',
+        xhrFields: {
+            responseType: 'arraybuffer'
+        },
+        processData: false,
+        headers: domHeaders,
+        error: function (data, textStatus, errorThrown) {
+            //console.log(data);
+            //console.log(textStatus);
+            var errStr = "Error: Failed javascript POST (err: "+data.responseText+")";
+            console.log(errStr);
+            domResult.html(errStr);
+            hd.imageIsWaiting = false;
+            return false;
+        },
+        success: function(data, textStatus, jqXHR) {
             if (methodKeys!=null) {     //valid protobuf type?
-                var bodyEncodedInString = new Uint8Array(request.response);
+                var bodyEncodedInString = new Uint8Array(data);
                 $("#protoOutput").prop("disabled",false);
                 hd.protoPayloadOutput = bodyEncodedInString;
+                //console.log(typeof(data));
+                //console.log(typeof(bodyEncodedInString));
+                //console.log(bodyEncodedInString);
 
                 // ---- method for processing from a type ----
                 var msgOutput = hd.protoObj[methodKeys[0]]['root'].lookupType(hd.protoObj[methodKeys[0]]['methods'][methodKeys[1]]['typeOut']);
@@ -340,6 +357,9 @@ function doPostImage(srcCanvas, dstDiv,) {
                     hd.imageIsWaiting = false;
                     return false;
                 }
+
+                console.log(msgOutput);
+                console.log(objOutput);
 
                 //try to crawl the fields in the protobuf....
                 var numFields = 0;
@@ -370,8 +390,7 @@ function doPostImage(srcCanvas, dstDiv,) {
             }
             hd.imageIsWaiting = false;
         }
-	}
-	request.send(sendPayload);
+	});
 }
 
 

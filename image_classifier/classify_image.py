@@ -38,6 +38,7 @@ def model_create_pipeline(path_model, path_label, top_n):
     from acumos.modeling import Model, List, create_namedtuple
     from acumos.session import Requirements
     from os import path
+    from _version import __version__
 
     # read dictionary to pass along to formatter class
     dict_classes = eval(open(path_label, 'r').read()) if path_label else None
@@ -66,9 +67,7 @@ def model_create_pipeline(path_model, path_label, top_n):
     df = ImageDecoder.generate_input_dataframe()
     image_type = tuple(zip(df.columns, ImageDecoder.generate_input_types()))
     name_in = "Image"
-    Image = create_namedtuple(name_in, image_type)
-    name_multiple_in = name_in + "s"
-    input_set = create_namedtuple(name_in + "Set", [(name_multiple_in, List[Image])])
+    input_image = create_namedtuple(name_in, image_type)
 
     # output of clasifier, list of tags
     df = Formatter.generate_output_dataframe()
@@ -77,12 +76,12 @@ def model_create_pipeline(path_model, path_label, top_n):
     ImageTag = create_namedtuple(name_out, tag_result)
     output_set = create_namedtuple(name_out + "Set", [(name_out + "s", List[ImageTag])])
 
-    def predict_class(val_wrapped: input_set) -> output_set:
+    def predict_class(val_wrapped: input_image) -> output_set:
         '''Returns an array of float predictions'''
         # NOTE: we don't have a named output type, so need to match 'value' to proto output
         # print("-===== input -===== ")
         # print(input_set)
-        df = pd.DataFrame(getattr(val_wrapped, name_multiple_in), columns=Image._fields)
+        df = pd.DataFrame([val_wrapped], columns=input_image._fields)
         # print("-===== df -===== ")
         # print(df)
         # print("-===== out df -===== ")
@@ -92,8 +91,8 @@ def model_create_pipeline(path_model, path_label, top_n):
         # print("-===== out list -===== ")
         # print(output_set)
         tags_list = [ImageTag(*r) for r in tags_parts['data']]
-        print("[{}]: Input {} row(s) ({}), output {} row(s) ({}))".format(
-              "image_classifier", len(df), input_set, len(tags_df), output_set))
+        print("[{} - {}:{}]: Input {} row(s) ({}), output {} row(s) ({}))".format(
+              "classify", MODEL_NAME, __version__, len(df), input_image, len(tags_df), output_set))
         return output_set(tags_list)
 
     # compute path of this package to add it as a dependency
@@ -125,12 +124,6 @@ def keras_evaluate(config):
         model, reqs = model_create_pipeline(config['model_path'], config['label_path'],
                                             config['num_top_predictions'])
 
-        if 'push_address' in config and 'auth_address' in config and config['push_address']:
-            from acumos.session import AcumosSession
-            session = AcumosSession(push_api=config['push_address'], auth_api=config['auth_address'])
-            print("Pushing new model to upload '{:}', auth '{:}'...".format(config['push_address'], config['auth_address']))
-            session.push(model, MODEL_NAME, reqs)  # creates ./my-iris.zip
-            taskComplete = True
 
         if 'dump_model' in config and config['dump_model']:
             from acumos.session import AcumosSession
@@ -140,6 +133,13 @@ def keras_evaluate(config):
             print("Dumping new model to '{:}'...".format(config['dump_model']))
             session = AcumosSession()
             session.dump(model, MODEL_NAME, config['dump_model'], reqs)  # creates ./my-iris.zip
+            taskComplete = True
+
+        if 'push_address' in config and 'auth_address' in config and config['push_address']:
+            from acumos.session import AcumosSession
+            session = AcumosSession(push_api=config['push_address'], auth_api=config['auth_address'])
+            print("Pushing new model to upload '{:}', auth '{:}'...".format(config['push_address'], config['auth_address']))
+            session.push(model, MODEL_NAME, reqs)  # creates ./my-iris.zip
             taskComplete = True
 
         preds = None
@@ -207,8 +207,8 @@ def main(config={}):
     parser.add_argument('-f', '--framework', type=str, default='keras', help='Underlying framework to utilize', choices=['keras', 'tensorflow'])
     parser.add_argument('-C', '--cuda_env', type=str, default='', help='Anything special to inject into CUDA_VISIBLE_DEVICES environment string')
     parser.add_argument('-n', '--num_top_predictions', type=int, default=30, help='Display this many predictions. (0=disable)')
-    parser.add_argument('-a', '--push_address', help='server address to push the model (e.g. http://localhost:8887/v2/upload)', default='')
-    parser.add_argument('-A', '--auth_address', help='server address for login and push of the model (e.g. http://localhost:8887/v2/auth)', default='')
+    parser.add_argument('-a', '--push_address', help='server address to push the model (e.g. http://localhost:8887/v2/upload)', default=os.getenv('ACUMOS_PUSH', ""))
+    parser.add_argument('-A', '--auth_address', help='server address for login and push of the model (e.g. http://localhost:8887/v2/auth)', default=os.getenv('ACUMOS_AUTH', ""))
     parser.add_argument('-d', '--dump_model', help='dump model to a pickle directory for local running', default='')
     config.update(vars(parser.parse_args()))  # pargs, unparsed = parser.parse_known_args()
 
