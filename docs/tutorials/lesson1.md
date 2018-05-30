@@ -41,7 +41,14 @@ python image_classifier/classify_image.py -m model.h5 -f keras -l data/keras_cla
 
 Example for training a model and pushing that model that returns all scores.
 ```
-python image_classifier/classify_image.py -m model.h5 -f keras -l data/keras_class_names.txt -n 0 -i data/elephant.jpg -a "http://localhost:8887/v2/upload" -A "http://localhost:8887/v2/auth"
+export ACUMOS_USERNAME="user"; \
+export ACUMOS_PASSWORD="password";
+or
+export ACUMOS_TOKEN="a_very_long_token";
+
+export ACUMOS_PUSH="https://acumos-challenge.org/onboarding-app/v2/models"; \
+export ACUMOS_AUTH="https://acumos-challenge.org/onboarding-app/v2/auth"; \
+python image_classifier/classify_image.py -m model.h5 -f keras -l data/keras_class_names.txt -n 0 -i data/elephant.jpg
 ```
 
 ## In-place Evaluation

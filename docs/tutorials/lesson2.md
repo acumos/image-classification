@@ -52,7 +52,7 @@ Example usage may be running with a model that was dumped to the directory `mode
 in the main repo source directory.
 
 ```
-python app.py --modeldir ../model --port 8885
+python app.py --modeldir ../model --port 8886
 ```
 
 
@@ -129,7 +129,7 @@ The optional HTTP parameter `rich_output` will generate a more decorated JSON ou
 * Additionally, a simple command-line utility could be used to post an image
 and mime type to the main interface.
 ```
-curl -F image_binary=@test.jpg -F rich_output="true" -F mime_type="image/jpeg" "http://localhost:8885/classify"
+curl -F image_binary=@test.jpg -F rich_output="true" -F mime_type="image/jpeg" "http://localhost:8886/classify"
 ```
 
 
@@ -141,7 +141,7 @@ This model runner can be locally duplicated by using the primary python library
 be consistent for use.
 
 ```
-python acumos-python-client/testing/wrap/runner.py  --port 8885 --modeldir model/
+python acumos-python-client/testing/wrap/runner.py  --port 8886 --modeldir model/
 ```
 
 The above command uses the testing-based model runner to launch a singular model
