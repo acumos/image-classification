@@ -25,7 +25,7 @@ created as a [demo web page](../../web_demo).
 This web page sample uses an HTML5 player to play an mp4 video and submit its
 frames to an image classification service.
 
-** Video Copyrights May Apply ** - the included sample videos may carry
+**Video Copyrights May Apply** - the included sample videos may carry
 additional copyrights and are not meant for public resale or consumption.
 
 * [video/stock-footage-bicycles.mp4](https://videos.pexels.com/videos/mountain-bikers-during-daytime-857083)
@@ -42,6 +42,21 @@ CORS or other cross-domain objections to dropping the file `image-classes.html`
 into the browser and accesing a locally hosted server API, as configured
 in [the previous tutorial](lesson2.md).
 
+### Open-source hosted run
+Utilizing the generous [htmlpreview function](https://htmlpreview.github.io/) available on
+Github, you can also experiment with the respository-based web resource.  This resource
+will proxy the repository `web_demo` directory into a live resource.
+
+Navigate to the [default webhost page](http://htmlpreview.github.io/?https://github.com/ezavesky/image-classification/blob/master/web_demo/image-classes.html)
+and confirm that the resource load properly.  The image at the bottom of this guide
+is a good reference for correct page loading and display.
+
+After confirming correct page load, simply replace the value in the `Transform URL`
+field to point at your deployed instance.  For example, if you've created a
+dumped model locally, it might be a localhost port.
+
+
+### Local webserver run
 If you want to run the test locally, you can use the built-in python
 webserver with the line below while working in the `web_demo` directory
 (assuming you're running python3).
@@ -51,7 +66,8 @@ python -m http.server 5000
 
 Afterwards, just point your browser at `http://localhost:5000/image-classes.html`.
 
-## Example mood classification demo (docker and protobuf)
+
+## Example image classification demo (docker and protobuf)
 To customize this demo, one should change either the included javascript
 or simply update the primary classification URL on the page itself during runtime.
 This demo utilizes the [javascript protobuf library](https://github.com/dcodeIO/ProtoBuf.js/)

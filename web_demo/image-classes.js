@@ -40,8 +40,7 @@ $(document).ready(function() {
         urlDefault = "http://localhost:8886/classify";
 
 	$(document.body).data('hdparams', {	// store global vars in the body element
-		classificationServerFirewallRoot: "http://135.207.105.218:8100",   // Renders HTML for file upload
-		classificationServerFirewall: "http://135.207.105.218:8100/upload",
+        	documentTitle: "Protobuf Demo",
 		classificationServer: urlDefault,
 		protoObj: null,   // to be back-filled after protobuf load {'root':obj, 'methods':{'xx':{'typeIn':x, 'typeOut':y}} }
 		protoPayloadInput: null,   //payload for encoded message download (if desired)
@@ -59,7 +58,6 @@ $(document).ready(function() {
 	});
 
 	var hd = $(document.body).data('hdparams');
-	//$('#serviceLink').attr("href", hd.classificationServerFirewallRoot);
 	hd.video.addEventListener("loadedmetadata", newVideo);
 
     $("#protoInput").prop("disabled",true).click(downloadBlobIn);
@@ -131,29 +129,39 @@ function protobuf_load(pathProto, forceSelect) {
     });
 }
 
-
+// modify the link and update our url
 function updateLink(domId) {
-    var sPageURL = decodeURIComponent(window.location.search.split('?')[0]);
     var newServer = $(document.body).data('hdparams')['classificationServer'];
-    var sNewUrl = sPageURL+"?url-image="+newServer;
-//    if (typeof(newServer)==string) {
-        $("#"+domId).attr('href', sNewUrl);
-//    }
+    var sNewUrl = updateQueryStringParameter(window.location.href, "url-image", newServer, "?");
+    $("#"+domId).attr('href', sNewUrl);
+    //window.history.pushState({}, $(document.body).data('hdparams')['documentTitle'], sNewUrl);
 }
 
-// https://stackoverflow.com/questions/19491336/get-url-parameter-jquery-or-how-to-get-query-string-values-in-js
-function getUrlParameter(sParam) {
-    var sPageURL = decodeURIComponent(window.location.search.substring(1)),
-        sURLVariables = sPageURL.split('&'),
-        sParameterName,
-        i;
+// https://stackoverflow.com/a/6021027
+function updateQueryStringParameter(uri, key, value, separator) {
+    var re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
+    if (uri.match(re)) {
+        return uri.replace(re, '$1' + key + "=" + value + '$2');
+    }
+    if (!separator) //allow forced/override
+       separator = uri.indexOf('?') !== -1 ? "&" : "?";
+    return uri + separator + key + "=" + value;
+}
 
-    for (i = 0; i < sURLVariables.length; i++) {
-        sParameterName = sURLVariables[i].split('=');
+// https://stackoverflow.com/a/3354511
+window.onpopstate = function(e){
+    if(e.state){
+        //document.getElementById("content").innerHTML = e.state.html;
+        $(document.body).data('hdparams')['documentTitle'] = e.state.pageTitle;
+    }
+};
 
-        if (sParameterName[0] === sParam) {
-            return sParameterName[1] === undefined ? true : sParameterName[1];
-        }
+function getUrlParameter(key) {
+    var re = new RegExp("([?&])" + key + "=(.*?)(&|$)", "i");
+    var match = window.location.search.match(re)
+    if (match) {
+        //console.log(match);
+        return match[match.length-2];
     }
 };
 
@@ -251,12 +259,8 @@ function doPostImage(srcCanvas, dstDiv,) {
         updateLink("serverLink", hd.classificationServer);
     }
 
-    var serviceURL = hd.classificationServer;
-    var request = new XMLHttpRequest();     // create request to manipulate
-
-    request.open("POST", serviceURL, true);
     hd.imageIsWaiting = true;
-
+    var domHeaders = {};
     var domResult = $(dstDiv);
     domResult.append($("<div>&nbsp;</div>").addClass('spinner'));
 
@@ -265,17 +269,13 @@ function doPostImage(srcCanvas, dstDiv,) {
         var blob = dataURItoBlob(dataURL, true);
 
         // fields from .proto file at time of writing...
-        // message ImageSet {
-        //   repeated Image Images = 1;
-        // }
-        //
         // message Image {
         //   string mime_type = 1;
         //   bytes image_binary = 2;
         // }
 
         //TODO: should we always assume this is input? answer: for now, YES, always image input!
-        var inputPayload = {'Images':[{ "mimeType": blob.type, "imageBinary": blob.bytes }]};
+        var inputPayload = { "mimeType": blob.type, "imageBinary": blob.bytes };
 
         // ---- method for processing from a type ----
         var msgInput = hd.protoObj[methodKeys[0]]['root'].lookupType(hd.protoObj[methodKeys[0]]['methods'][methodKeys[1]]['typeIn']);
@@ -299,13 +299,13 @@ function doPostImage(srcCanvas, dstDiv,) {
         hd.protoPayloadInput = sendPayload;
 
         //request.setRequestHeader("Content-type", "application/octet-stream;charset=UTF-8");
-        request.setRequestHeader("Content-type", "text/plain;charset=UTF-8");
-        request.responseType = 'arraybuffer';
+        domHeaders["Content-type"] = "text/plain;charset=UTF-8";
+        //request.responseType = 'arraybuffer';
     }
     else {
         var blob = dataURItoBlob(dataURL, false);
         sendPayload = new FormData();
-        if (true) { // hd.serverIsLocal) {
+        if (hd.serverIsLocal) {
             serviceURL = hd.classificationServer;
             sendPayload.append("image_binary", blob);
             sendPayload.append("mime_type", blob.type);
@@ -319,13 +319,34 @@ function doPostImage(srcCanvas, dstDiv,) {
     }
 
     //$(dstImg).addClaas('workingImage').siblings('.spinner').remove().after($("<span class='spinner'>&nbsp;</span>"));
-
-    request.onreadystatechange=function() {
-        if (request.readyState==4 && request.status>=200 && request.status<300) {
+    $.ajax({
+        type: 'POST',
+        url: hd.classificationServer,
+        data: sendPayload,
+        crossDomain: true,
+        dataType: 'native',
+        xhrFields: {
+            responseType: 'arraybuffer'
+        },
+        processData: false,
+        headers: domHeaders,
+        error: function (data, textStatus, errorThrown) {
+            //console.log(data);
+            //console.log(textStatus);
+            var errStr = "Error: Failed javascript POST (err: "+data.responseText+")";
+            console.log(errStr);
+            domResult.html(errStr);
+            hd.imageIsWaiting = false;
+            return false;
+        },
+        success: function(data, textStatus, jqXHR) {
             if (methodKeys!=null) {     //valid protobuf type?
-                var bodyEncodedInString = new Uint8Array(request.response);
+                var bodyEncodedInString = new Uint8Array(data);
                 $("#protoOutput").prop("disabled",false);
                 hd.protoPayloadOutput = bodyEncodedInString;
+                //console.log(typeof(data));
+                //console.log(typeof(bodyEncodedInString));
+                //console.log(bodyEncodedInString);
 
                 // ---- method for processing from a type ----
                 var msgOutput = hd.protoObj[methodKeys[0]]['root'].lookupType(hd.protoObj[methodKeys[0]]['methods'][methodKeys[1]]['typeOut']);
@@ -340,6 +361,9 @@ function doPostImage(srcCanvas, dstDiv,) {
                     hd.imageIsWaiting = false;
                     return false;
                 }
+
+                //console.log(msgOutput);
+                console.log(objOutput);     //log parsed objects to console
 
                 //try to crawl the fields in the protobuf....
                 var numFields = 0;
@@ -370,8 +394,7 @@ function doPostImage(srcCanvas, dstDiv,) {
             }
             hd.imageIsWaiting = false;
         }
-	}
-	request.send(sendPayload);
+	});
 }
 
 

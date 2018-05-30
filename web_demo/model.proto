@@ -2,11 +2,7 @@ syntax = "proto3";
 package ZmazgwcYOzRPSlAKlNLcoITKjByZchTo;
 
 service Model {
-  rpc classify (ImageSet) returns (ImageTagSet);
-}
-
-message ImageSet {
-  repeated Image Images = 1;
+  rpc classify (Image) returns (ImageTagSet);
 }
 
 message Image {
