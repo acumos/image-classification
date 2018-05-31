@@ -26,14 +26,9 @@ To run from files, and to access local camera, launch chrome from  the command l
 <head>
 <title>Image Classification</title>
 <link rel="stylesheet" type="text/css" href="image-classes.css" />
-<script type="text/javascript" src="jquery.js"></script>
-<script type="text/javascript" src="protobuf/protobuf.min.js"></script>
-<script type="text/javascript" src="video-list.js"></script>
-<script type="text/javascript" src="image-classes.js"></script>
-<script type="text/javascript" src="video-list.js"></script>
 </head>
 <body>
-<video class="videoWin" id="srcVideo" muted >
+<video class="videoWin" id="srcVideo" muted controls crossorigin>
 <source id="mp4" src="video/unknown.mp4" type="video/mp4"></source>
 Your browser does not support the video tag. Please use Chrome or Firefox.
 </video>
@@ -57,7 +52,7 @@ Your browser does not support the video tag. Please use Chrome or Firefox.
         <td><span class="tiny">Add the query parameter <em><a href="." id="serverLink">url-image</a></em> to auto-load this URL.</span></td></tr>
 </table>
 </form>
-<div id='refline' style='width:900'>
+<hr width='100%' >
 <br/>Image classification using deep convolutional neural nets (CNNs) and the
 <a href="https://www.tensorflow.org/versions/r0.12/tutorials/image_recognition/index.html">TensorFlow</a>
 machine learning framework
@@ -71,6 +66,13 @@ The dataset consists of <a href="http://image-net.org/challenges/LSVRC/2014/brow
 <br/>
 <a href='http://www.research.att.com/sites/labs_research/video_media_analytics'>Video and Machine Learning Research</a>
 </div>
-<canvas id="srcImgCanvas" width="480" height="270" style="visibility:hidden;position:absolute;top:0;left:0"></canvas>
+<canvas id="srcImgCanvas" width="480" height="270" style="visibility:hidden;position:absolute;top:0;left:0" crossorigin></canvas>
+<!-- delay loading until last minute --->
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="protobuf/protobuf.min.js"></script>
+<script type="text/javascript" src="jquery-ajax-native.js"></script>
+<script type="text/javascript" src="video-list.js"></script>
+<script type="text/javascript" src="image-classes.js"></script>
+<script type="text/javascript" src="demo-framework.js"></script>
 </body>
 </html>

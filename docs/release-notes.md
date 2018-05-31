@@ -20,6 +20,10 @@
 
 # Image Classification Release Notes
 ## 0.5
+### 0.5.1
+* Update model to use single image as input type
+* Update javascript demo to run on github htmlpreview page (CORS, JS updates)
+
 ### 0.5.0
 * Documentation (lesson1) updated with model runner examples.  Deprecation notice
   in using explicit proto- and swagger-based serves.
