@@ -24,9 +24,11 @@ import pytest
 def test_classify_single(monkeypatch):
     pathRoot = env_update(monkeypatch)
     from image_classifier import classify_image
-    dfSample = classify_image.create_sample(path.join(pathRoot, 'data', 'elephant.jpg'))
-    assert len(dfSample) == 1                       # just one image, no image
-    print(dfSample)   # run `pytest -s` for more verbosity
+    data_tuple = classify_image.create_sample(path.join(pathRoot, 'data', 'elephant.jpg'))
+    assert len(data_tuple) == 2                       # just one image, no image
+    assert type(data_tuple[0]) == str
+    assert type(data_tuple[1]) == bytes
+    print(data_tuple)   # run `pytest -s` for more verbosity
 
     # TODO: future testing generation of model? or does it belong here because of data dependence?
     # acModel = classify_image.model_create_pipeline(config['model_path'], config['label_path'],

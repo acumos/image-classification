@@ -42,7 +42,8 @@ The probabilities are normalized to sum to 1.0 over all values so that they
 
 can utilized as relative confidence scores.
 A web demo is included with the source code, available via the
-[Acumos Gerrit repository](https://gerrit.acumos.org/r/gitweb?p=image-classification.git;a=summary).
+[Acumos Gerrit repository](https://gerrit.acumos.org/r/gitweb?p=image-classification.git;a=summary) or
+the mirrored [Acumos Github repository](https://github.com/acumos/image-classification).
 It utilizes a protobuf javascript library and inputs captured frames
 from a few video samples to classify and display the top N detected
 classification scores, as illustrated in the model image.

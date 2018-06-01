@@ -20,6 +20,12 @@
 
 # Image Classification Release Notes
 ## 0.5
+### 0.5.1
+* Update model to use single image as input type
+* Update javascript demo to run with better CORS behavior (github htmlpreview)
+* Additional documentation for environmental variables
+* Simplify operation for active prediction to use created model (no save+load required)
+
 ### 0.5.0
 * Documentation (lesson1) updated with model runner examples.  Deprecation notice
   in using explicit proto- and swagger-based serves.
