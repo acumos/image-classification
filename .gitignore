@@ -10,6 +10,9 @@ checkpoints*
 logs/
 summary/
 
+# prevent h5 files from going into repo
+*.h5
+
 # PyCharm
 .idea/
 
@@ -100,6 +103,7 @@ ENV/
 
 # Spyder project settings
 .spyderproject
+.pytest_cache
 
 # Rope project settings
 .ropeproject
