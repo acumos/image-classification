@@ -16,13 +16,14 @@
 .. limitations under the License.
 .. ===============LICENSE_END=========================================================
 
+.. _tutorials:
+
 ========
-Tutorial
+Tutorials
 ========
 
 .. toctree::
        :maxdepth: 2
 
-       lesson1
-       lesson2
-       lesson3
+       deployment
+       demonstration

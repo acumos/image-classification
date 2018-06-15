@@ -1,4 +1,4 @@
-<!---
+
 .. ===============LICENSE_START=======================================================
 .. Acumos CC-BY-4.0
 .. ===================================================================================
@@ -16,18 +16,23 @@
 .. See the License for the specific language governing permissions and
 .. limitations under the License.
 .. ===============LICENSE_END=========================================================
--->
 
-# image-classification
+
+|Build Status|
+
+======================
+image-classification
+======================
+
 A model example for image classification within Acumos.
 
 This documentation has been distributed into related sub-documents.
 
+* `Overall Documentation <docs/image-classification.rst>`_
+* `Release Notes <docs/release-notes.rst>`_
+* `Tutorials <docs/tutorials/index.rst>`_
+   * `Deployment and Running <docs/tutorials/deployment.rst>`_
+   * `Web Application <docs/tutorials/demonstration.rst>`_
 
-* [Overall Documentation](docs/image-classification.md)
-* [Release Notes](docs/release-notes.md)
-* Tutorials
-   * [Deployment and Running](docs/tutorials/lesson1.md),
-   * [Swagger API server](docs/tutorials/lesson2.md), and
-   * [Web Application](docs/tutorials/lesson3.md)
-
+.. |Build Status| image:: https://jenkins.acumos.org/buildStatus/icon?job=image-classification-tox-verify-master
+   :target: https://jenkins.acumos.org/job/image-classification-tox-verify-master/
