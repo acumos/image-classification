@@ -110,20 +110,13 @@ def create_sample(path_image, input_type="image/jpeg"):
 def keras_evaluate(config):
     taskComplete = False
     useSklearn = True
-    listImages = []
-
-    if 'image_list' in config and config['image_list']:
-        dfImages = pd.read_csv(config['image_list'], header=None, names=['file'], delimiter=",")
-        listImages = dfImages['file'].tolist()
-        config['image'] = listImages[0]
-    X = create_sample(config['image'])
+    model = None
 
     if useSklearn:
         # formulate the pipelien to be used
         from image_classifier.keras_model.prediction_formatter import Formatter
         model, reqs = model_create_pipeline(config['model_path'], config['label_path'],
                                             config['num_top_predictions'])
-
 
         if 'dump_model' in config and config['dump_model']:
             from acumos.session import AcumosSession
@@ -142,33 +135,6 @@ def keras_evaluate(config):
             session.push(model, MODEL_NAME, reqs)  # creates ./my-iris.zip
             taskComplete = True
 
-        preds = None
-        if not taskComplete:   # means we need to run a prediction/classify
-            if not listImages:
-                listImages = [config['image']]
-            preds = None
-
-            wrapped_model = model  # 5/31/18, simplify to reuse already created model
-            type_in = wrapped_model.classify.input_type
-
-            for idx in range(len(listImages)):
-                curImage = listImages[idx]
-                print("Attempting classification of image [{:}]: {:}...".format(idx, curImage))
-
-                X = create_sample(curImage)
-                classify_in = type_in(*X)
-                pred_raw = wrapped_model.classify.wrapped(classify_in)
-                if len(pred_raw._fields) == 1:  # type is nested?, go down one level
-                    pred_raw = getattr(pred_raw, pred_raw._fields[0])
-                # already a wrapped response
-                predNew = pd.DataFrame(pred_raw)
-                predNew[Formatter.COL_NAME_IDX] = idx
-                if preds is None:
-                    preds = predNew
-                else:
-                    preds = preds.append(predNew, ignore_index=True)
-            preds.reset_index(drop=True, inplace=True)
-
     """
     Disable non-sklearn path for now
     else:
@@ -184,30 +150,64 @@ def keras_evaluate(config):
         preds = model.predict(img)
     """
 
+    preds = None
+    if model and not taskComplete:   # means we need to run a prediction/classify
+        if not os.path.exists(config['image']) and (config['image_list'] and not os.path.exists(config['image_list'])):
+            print("The target image/list '{}'/'{}' was not found, please check input arguments.".format(config['image'], config['image_list']))
+            sys.exit(-1)
+
+        listImages = []
+        if config['image_list']:  # provided a list to run with?
+            dfImages = pd.read_csv(config['image_list'], header=None, names=['file'], delimiter=",")
+            listImages = dfImages['file'].tolist()
+
+        if len(listImages) == 0:   # make a list if just one item
+            listImages = [config['image']]
+
+        wrapped_model = model  # 5/31/18, simplify to reuse already created model
+        type_in = wrapped_model.classify.input_type
+
+        for idx in range(len(listImages)):
+            curImage = listImages[idx]
+            print("Attempting classification of image [{:}]: {:}...".format(idx, curImage))
+
+            X = create_sample(curImage)
+            classify_in = type_in(*X)
+            pred_raw = wrapped_model.classify.wrapped(classify_in)
+            if len(pred_raw._fields) == 1:  # type is nested?, go down one level
+                pred_raw = getattr(pred_raw, pred_raw._fields[0])
+            # already a wrapped response
+            predNew = pd.DataFrame(pred_raw)
+            predNew[Formatter.COL_NAME_IDX] = idx
+            if preds is None:
+                preds = predNew
+            else:
+                preds = preds.append(predNew, ignore_index=True)
+        preds.reset_index(drop=True, inplace=True)
+
     return preds
 
 
 def main(config={}):
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument('-m', '--model_path', type=str, default='', help="Path to read and store image model.")
-    parser.add_argument('-l', '--label_path', type=str, default='', help="Path to class label file, unnamed if empty (i.e. data/keras_class_names.txt).")
-    parser.add_argument('-p', '--predict_path', type=str, default='', help="Optional place to save intermediate predictions from model (if provided, skips model call)")
-    parser.add_argument('-i', '--image', type=str, default='', help='Absolute path to image file. (for now must be a jpeg)')
-    parser.add_argument('-I', '--image_list', type=str, default='', help='To batch process multiple images in one load')
-    parser.add_argument('-f', '--framework', type=str, default='keras', help='Underlying framework to utilize', choices=['keras', 'tensorflow'])
-    parser.add_argument('-C', '--cuda_env', type=str, default='', help='Anything special to inject into CUDA_VISIBLE_DEVICES environment string')
-    parser.add_argument('-n', '--num_top_predictions', type=int, default=30, help='Display this many predictions. (0=disable)')
-    parser.add_argument('-a', '--push_address', help='server address to push the model (e.g. http://localhost:8887/v2/upload)', default=os.getenv('ACUMOS_PUSH', ""))
-    parser.add_argument('-A', '--auth_address', help='server address for login and push of the model (e.g. http://localhost:8887/v2/auth)', default=os.getenv('ACUMOS_AUTH', ""))
-    parser.add_argument('-d', '--dump_model', help='dump model to a pickle directory for local running', default='')
+    submain = parser.add_argument_group('main execution and evaluation functionality')
+    submain.add_argument('-m', '--model_path', type=str, default='model.h5', help="Path to read and store image model. (created if not provided)")
+    submain.add_argument('-i', '--image', type=str, default='', help='Absolute path to image file. (for now must be a jpeg)')
+    submain.add_argument('-I', '--image_list', type=str, default='', help='To batch process multiple images in one load')
+    submain.add_argument('-p', '--predict_path', type=str, default='', help="Optional place to save intermediate predictions from model")
+    subopts = parser.add_argument_group('model creation and configuration options')
+    subopts.add_argument('-f', '--framework', type=str, default='keras', help='Underlying framework to utilize', choices=['keras', 'tensorflow'])
+    subopts.add_argument('-C', '--cuda_env', type=str, default='', help='Anything special to inject into CUDA_VISIBLE_DEVICES environment string')
+    submain.add_argument('-l', '--label_path', type=str, default='data/keras_class_names.txt', help="Path to class label file for output columns, unnamed if empty (i.e. data/keras_class_names.txt).")
+    subopts.add_argument('-n', '--num_top_predictions', type=int, default=30, help='Display this many predictions. (0=disable)')
+    subopts.add_argument('-a', '--push_address', help='server address to push the model (e.g. http://localhost:8887/v2/upload)', default=os.getenv('ACUMOS_PUSH', ""))
+    subopts.add_argument('-A', '--auth_address', help='server address for login and push of the model (e.g. http://localhost:8887/v2/auth)', default=os.getenv('ACUMOS_AUTH', ""))
+    subopts.add_argument('-d', '--dump_model', help='dump model to a directory for local running', default='')
     config.update(vars(parser.parse_args()))  # pargs, unparsed = parser.parse_known_args()
 
     if config['framework'] != 'keras':
         print("Sorry, at this time only the 'keras' framework is supported.")
-        sys.exit(-1)
-    if not os.path.exists(config['image']) and not config['image_list']:
-        print("The target image '{:}' was not found, please check input arguments.".format(config['image']))
         sys.exit(-1)
 
     # If you want to use a GPU set its index here
@@ -226,7 +226,7 @@ def main(config={}):
 
 
 if __name__ == '__main__':
-    import os, sys
+    import os
     # patch the path to include this object
     pathRoot = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     if pathRoot not in sys.path:

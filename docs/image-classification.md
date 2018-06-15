@@ -71,18 +71,17 @@ Package dependencies for the core code and testing have been flattened into a
 single file for convenience. Instead of installing this package into your
 your local environment, execute the command below.
 
+**Note:** If you are using an [anaconda-based environment](https://anaconda.org),
+you may want to try installing with conda first and then pip.
+to mixing mixing package stores.
 ```
-pip install -r requirments.txt
-```
-or, if you want ot install dependencies with a package place holder...
-```
-pip install .
+conda install --yes --file requirements.txt  # suggested first step if you're using conda
 ```
 
-**Note:** If you are using an [anaconda-based environment](https://anaconda.org),
-you may want to try
-installing these packages [directly](https://docs.anaconda.com/anaconda-repository/user-guide/tasks/pkgs/download-install-pkg).
-to avoid mixing of `pip` and `conda` package stores.
+Installation of the package requirements for a new environment.
+```
+pip install -r requirements.txt
+```
 
 
 ## Usage
@@ -92,26 +91,31 @@ uses.   All functionality is encapsulsted in the `classify_image.py`
 script and has the following arguments.
 
 ```
-usage: classify_image.py [-h] [-m MODEL_PATH] [-l LABEL_PATH]
-                         [-p PREDICT_PATH] [-i IMAGE] [-I IMAGE_LIST]
-                         [-f {keras,tensorflow}] [-C CUDA_ENV]
+usage: classify_image.py [-h] [-m MODEL_PATH] [-i IMAGE] [-I IMAGE_LIST]
+                         [-p PREDICT_PATH] [-f {keras,tensorflow}]
+                         [-C CUDA_ENV] [-l LABEL_PATH]
                          [-n NUM_TOP_PREDICTIONS] [-a PUSH_ADDRESS]
                          [-A AUTH_ADDRESS] [-d DUMP_MODEL]
 
 optional arguments:
   -h, --help            show this help message and exit
+
+main execution and evaluation functionality:
   -m MODEL_PATH, --model_path MODEL_PATH
-                        Path to read and store image model.
-  -l LABEL_PATH, --label_path LABEL_PATH
-                        Path to class label file, unnamed if empty (i.e.
-                        data/keras_class_names.txt).
-  -p PREDICT_PATH, --predict_path PREDICT_PATH
-                        Optional place to save intermediate predictions from
-                        model (if provided, skips model call)
+                        Path to read and store image model. (created if not
+                        provided)
   -i IMAGE, --image IMAGE
                         Absolute path to image file. (for now must be a jpeg)
   -I IMAGE_LIST, --image_list IMAGE_LIST
                         To batch process multiple images in one load
+  -p PREDICT_PATH, --predict_path PREDICT_PATH
+                        Optional place to save intermediate predictions from
+                        model
+  -l LABEL_PATH, --label_path LABEL_PATH
+                        Path to class label file for output columns, unnamed
+                        if empty (i.e. data/keras_class_names.txt).
+
+model creation and configuration options:
   -f {keras,tensorflow}, --framework {keras,tensorflow}
                         Underlying framework to utilize
   -C CUDA_ENV, --cuda_env CUDA_ENV
@@ -126,7 +130,8 @@ optional arguments:
                         server address for login and push of the model (e.g.
                         http://localhost:8887/v2/auth)
   -d DUMP_MODEL, --dump_model DUMP_MODEL
-                        dump model to a pickle directory for local running
+                        dump model to a directory for local running
+
 ```
 
 # Example Usages
