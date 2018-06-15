@@ -96,7 +96,7 @@ button will be enabled and a binary file will be generated in the browser.
 
 ```
 protoc --decode=ZmazgwcYOzRPSlAKlNLcoITKjByZchTo.ImageTagSet model.proto < protobuf.out.bin
-protoc --decode=ZmazgwcYOzRPSlAKlNLcoITKjByZchTo.ImageSet model.proto < protobuf.in.bin
+protoc --decode=ZmazgwcYOzRPSlAKlNLcoITKjByZchTo.Image model.proto < protobuf.in.bin
 ```
 
 **NOTE** The specific package name may have changed since the time of writing,

@@ -39,7 +39,7 @@ Example for training a model that will return the top 100 classifier scores.
 python image_classifier/classify_image.py -m model.h5 -f keras -l data/keras_class_names.txt -n 100 -d model -i data/elephant.jpg
 ```
 
-Example for training a model and pushing that model that returns all scores.
+Example for training a model, dumping it to disk, and pushing that model that returns all scores. **(recommended)**
 ```
 export ACUMOS_USERNAME="user"; \
 export ACUMOS_PASSWORD="password";
@@ -48,7 +48,7 @@ export ACUMOS_TOKEN="a_very_long_token";
 
 export ACUMOS_PUSH="https://acumos-challenge.org/onboarding-app/v2/models"; \
 export ACUMOS_AUTH="https://acumos-challenge.org/onboarding-app/v2/auth"; \
-python image_classifier/classify_image.py -m model.h5 -f keras -l data/keras_class_names.txt -n 0 -i data/elephant.jpg
+python image_classifier/classify_image.py -n 0 -d model
 ```
 
 ## In-place Evaluation
@@ -57,6 +57,11 @@ instead wrap it in memory and use it in-place.  This mode is handy for quick
 evaluation of images or image sets for use in other classifiers.
 
 * [model-t.jpg](https://www.pexels.com/photo/aged-antique-automobile-automotive-208582/)
+
+Example for dumping model for use in cascade scenario (all classes return probability). *recommended*
+```
+python image_classifier/classify_image.py -n 0 -d model
+```
 
 Example for evaluation of a test image with top 5 results.
 ```
