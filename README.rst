@@ -1,4 +1,4 @@
-<!---
+
 .. ===============LICENSE_START=======================================================
 .. Acumos CC-BY-4.0
 .. ===================================================================================
@@ -16,19 +16,23 @@
 .. See the License for the specific language governing permissions and
 .. limitations under the License.
 .. ===============LICENSE_END=========================================================
--->
-
-# web_demo
-This directory provides a simple web page and demo content for
-the image-based classifier demo.
-
-Please consult the [tutorial documentation](../docs/tutorials/lesson3.md) for more information.
-
-* [video/stock-footage-bicycles.mp4](https://videos.pexels.com/videos/mountain-bikers-during-daytime-857083)
-* [video/stock-footage-city-cars.mp4](https://videos.pexels.com/videos/cars-on-the-road-854745)
-* [video/stock-footage-coast-time.mp4](https://videos.pexels.com/videos/sunset-by-the-sea-857056)
-* [video/stock-footage-dogs.mp4](https://videos.pexels.com/videos/dogs-playing-853846)
-* [video/stock-footage-squirrel.mp4](https://videos.pexels.com/videos/squirrel-eating-855213)
-* [video/stock-footage-scuba.mp4](https://videos.pexels.com/videos/paddle-surfing-and-scuba-diving-video-854387)
 
 
+|Build Status|
+
+======================
+image-classification
+======================
+
+A model example for image classification within Acumos.
+
+This documentation has been distributed into related sub-documents.
+
+* `Overall Documentation <docs/image-classification.rst>`_
+* `Release Notes <docs/release-notes.rst>`_
+* `Tutorials <docs/tutorials/index.rst>`_
+   * `Deployment and Running <docs/tutorials/deployment.rst>`_
+   * `Web Application <docs/tutorials/demonstration.rst>`_
+
+.. |Build Status| image:: https://jenkins.acumos.org/buildStatus/icon?job=image-classification-tox-verify-master
+   :target: https://jenkins.acumos.org/job/image-classification-tox-verify-master/

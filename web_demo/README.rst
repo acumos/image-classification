@@ -1,4 +1,3 @@
-<!---
 .. ===============LICENSE_START=======================================================
 .. Acumos CC-BY-4.0
 .. ===================================================================================
@@ -16,18 +15,18 @@
 .. See the License for the specific language governing permissions and
 .. limitations under the License.
 .. ===============LICENSE_END=========================================================
--->
 
-# image-classification
-A model example for image classification within Acumos.
+Web Demonstration
+================
 
-This documentation has been distributed into related sub-documents.
+This directory provides a simple web page and demo content for the
+image-based classifier demo.
 
+Please consult the `tutorial documentation <../docs/tutorials/demostration.rst>`__ for more information.
 
-* [Overall Documentation](docs/image-classification.md)
-* [Release Notes](docs/release-notes.md)
-* Tutorials
-   * [Deployment and Running](docs/tutorials/lesson1.md),
-   * [Swagger API server](docs/tutorials/lesson2.md), and
-   * [Web Application](docs/tutorials/lesson3.md)
-
+-  `video/stock-footage-bicycles.mp4 <https://videos.pexels.com/videos/mountain-bikers-during-daytime-857083>`__
+-  `video/stock-footage-city-cars.mp4 <https://videos.pexels.com/videos/cars-on-the-road-854745>`__
+-  `video/stock-footage-coast-time.mp4 <https://videos.pexels.com/videos/sunset-by-the-sea-857056>`__
+-  `video/stock-footage-dogs.mp4 <https://videos.pexels.com/videos/dogs-playing-853846>`__
+-  `video/stock-footage-squirrel.mp4 <https://videos.pexels.com/videos/squirrel-eating-855213>`__
+-  `video/stock-footage-scuba.mp4 <https://videos.pexels.com/videos/paddle-surfing-and-scuba-diving-video-854387>`__
