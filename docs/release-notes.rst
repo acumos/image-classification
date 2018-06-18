@@ -1,4 +1,3 @@
-<!---
 .. ===============LICENSE_START=======================================================
 .. Acumos CC-BY-4.0
 .. ===================================================================================
@@ -16,21 +15,38 @@
 .. See the License for the specific language governing permissions and
 .. limitations under the License.
 .. ===============LICENSE_END=========================================================
--->
 
-# Image Classification Release Notes
-## 0.5
-### 0.5.2
+.. _release_notes:
+
+==================================
+Image Classification Release Notes
+==================================
+
+0.5.3
+=====
+
+* Clean up tutorial documentation naming and remove deprecated swagger demo app
+
+
+0.5.2
+=====
+
 * Clean up documentation for install and parameter descriptions
 * Add documentation and functionality for environment variables in push request
 
-### 0.5.1
+
+0.5.1
+=====
+
 * Update model to use single image as input type
 * Update javascript demo to run with better CORS behavior (github htmlpreview)
 * Additional documentation for environmental variables
 * Simplify operation for active prediction to use created model (no save+load required)
 
-### 0.5.0
+
+0.5.0
+=====
+
 * Documentation (lesson1) updated with model runner examples.  Deprecation notice
   in using explicit proto- and swagger-based serves.
 * Update the structure of the protobuf input and output to use flattened (row-based)
@@ -39,33 +55,53 @@
   for image data.
 * Update the demonstration HTML pages for similar modifications.
 
-## 0.4
-### 0.4.6
+
+0.4.6
+=====
+
 * Update image examples for open-source video.
 
-### 0.4.5
+
+0.4.5
+=====
+
 * Documentation and package update to use install instructions instead of installing
   this package directly into a user's environment.
 * License addition
 
-### 0.4.4
-* Refactor to remote the demo `bin` scripts and rewire for direct call of the
-  script `classify_image.py` as the primary interaction mechanism.
+
+0.4.4
+=====
+
+* Refactor to remote the demo ``bin`` scripts and rewire for direct call of the
+  script ``classify_image.py`` as the primary interaction mechanism.
 * Refactor documentation into sections and tutorials.
 * Create this release notes document for better version understanding.
 
-### 0.4.3
+
+0.4.3
+=====
+
 * Minor refactor to avoid possibly reserved syntax name
 
-### 0.4.2
+
+0.4.2
+=====
+
 * Refactor for compliant dataframe usage following primary client library
   examples for repeated columns (e.g. dataframes) instead of custom types
   that parsed rows individually.
 * Refactor web, api, main model wrapper code for corresponding changes.
 
-### 0.4.0
+
+0.4.0
+=====
+
 * Migration from previous library structure to new acumos client library
 * Refactor to not need **this** library as a runtime/installed dependency
 
-## 0.3
+
+0.3
+===
+
 * Added example for evaluation of a multiple image with all results, saving predictions.

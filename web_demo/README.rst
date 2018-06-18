@@ -1,4 +1,3 @@
-<!---
 .. ===============LICENSE_START=======================================================
 .. Acumos CC-BY-4.0
 .. ===================================================================================
@@ -16,19 +15,18 @@
 .. See the License for the specific language governing permissions and
 .. limitations under the License.
 .. ===============LICENSE_END=========================================================
--->
 
-# web_demo
-This directory provides a simple web page and demo content for
-the image-based classifier demo.
+Web Demonstration
+=================
 
-Please consult the [tutorial documentation](../docs/tutorials/lesson3.md) for more information.
+This directory provides a simple web page and demo content for the
+image-based classifier demo.
 
-* [video/stock-footage-bicycles.mp4](https://videos.pexels.com/videos/mountain-bikers-during-daytime-857083)
-* [video/stock-footage-city-cars.mp4](https://videos.pexels.com/videos/cars-on-the-road-854745)
-* [video/stock-footage-coast-time.mp4](https://videos.pexels.com/videos/sunset-by-the-sea-857056)
-* [video/stock-footage-dogs.mp4](https://videos.pexels.com/videos/dogs-playing-853846)
-* [video/stock-footage-squirrel.mp4](https://videos.pexels.com/videos/squirrel-eating-855213)
-* [video/stock-footage-scuba.mp4](https://videos.pexels.com/videos/paddle-surfing-and-scuba-diving-video-854387)
+Please consult the `tutorial documentation <../docs/tutorials/demostration.rst>`__ for more information.
 
-
+-  `video/stock-footage-bicycles.mp4 <https://videos.pexels.com/videos/mountain-bikers-during-daytime-857083>`__
+-  `video/stock-footage-city-cars.mp4 <https://videos.pexels.com/videos/cars-on-the-road-854745>`__
+-  `video/stock-footage-coast-time.mp4 <https://videos.pexels.com/videos/sunset-by-the-sea-857056>`__
+-  `video/stock-footage-dogs.mp4 <https://videos.pexels.com/videos/dogs-playing-853846>`__
+-  `video/stock-footage-squirrel.mp4 <https://videos.pexels.com/videos/squirrel-eating-855213>`__
+-  `video/stock-footage-scuba.mp4 <https://videos.pexels.com/videos/paddle-surfing-and-scuba-diving-video-854387>`__
