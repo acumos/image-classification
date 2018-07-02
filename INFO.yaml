@@ -1,0 +1,57 @@
+---
+project: 'image-classification'
+project_creation_date: '2017-11-17'
+project_category: ''
+lifecycle_state: 'Incubation'
+project_lead: &acumos_image-classification_ptl
+    name: 'Ken Kristiansen'
+    email: 'kk4281@att.com'
+    id: 'kk4281'
+    company: 'ATT'
+    timezone: 'America/New_York'
+primary_contact: *acumos_image-classification_ptl
+issue_tracking:
+    type: 'jira'
+    url: 'https://jira.acumos.org/projects/ACUMOS'
+    key: 'ACUMOS'
+mailing_list:
+    type: 'groups.io'
+    url: 'https://lists.acumos.org'
+    tag: '<[sub-project_name]>'
+realtime_discussion:
+    type: 'irc'
+    server: 'freenode.net'
+    channel: '#acumos'
+meetings:
+    - type: ''
+      agenda: ''
+      url: ''
+      server: ''
+      channel: ''
+      repeats: ''
+      time: ''
+repositories:
+    - 'image-classification'
+committers:
+    - name: 'Aimee Ukasick'
+      email: 'aimeeu@research.att.com'
+      company: 'ATT'
+      id: 'aimeeu'
+      timezone: 'America/Chicago'
+    - name: 'Eric Z'
+      email: 'ezavesky@research.att.com'
+      company: 'ATT'
+      id: 'ezsomething'
+      timezone: 'America/Chicago'
+    - name: 'David Gibbon'
+      email: 'david.gibbon@gmail.com'
+      company: 'ATT'
+      id: 'DavidGibbon'
+      timezone: ''
+    - name: 'Bryan Sullivan'
+      email: 'bryan.sullivan@research.att.com'
+      company: 'ATT'
+      id: 'blsaws'
+      timezone: 'America/Los_Angeles'
+tsc:
+    approval: 'https://lists.acumos.org/g/tscgeneral'
