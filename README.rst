@@ -26,13 +26,6 @@ image-classification
 
 A model example for image classification within Acumos.
 
-This documentation has been distributed into related sub-documents.
-
-* `Overall Documentation <docs/image-classification.rst>`_
-* `Release Notes <docs/release-notes.rst>`_
-* `Tutorials <docs/tutorials/index.rst>`_
-   * `Deployment and Running <docs/tutorials/deployment.rst>`_
-   * `Web Application <docs/tutorials/demonstration.rst>`_
 
 .. |Build Status| image:: https://jenkins.acumos.org/buildStatus/icon?job=image-classification-tox-verify-master
    :target: https://jenkins.acumos.org/job/image-classification-tox-verify-master/

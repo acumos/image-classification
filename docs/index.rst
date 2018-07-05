@@ -24,5 +24,5 @@ Image Classification
        :maxdepth: 2
 
        image-classification
-       release-notes
        tutorials/index
+       release-notes

@@ -16,14 +16,15 @@
 .. limitations under the License.
 .. ===============LICENSE_END=========================================================
 
-.. _deployment:
+.. _deployment_image-classification:
 
-=========================================
-Deployment: Wrapping and Executing Models
-=========================================
+
+==============================================================
+Deployment: Wrapping and Executing Image Classification Models
+==============================================================
 
 To utilize this classifier model, it wraps and deploys a version of the
-underlying keras (or tensorflow) model.  Continue to the `demonstration tutorial <demonstration.rst>`_
+underlying keras (or tensorflow) model.  Continue to the :ref:`demonstration-image_classification`
 to see how to utilize these models in a demo scenario.
 
 Model Deployment
@@ -31,7 +32,7 @@ Model Deployment
 Following similar use pattens described by the main client library, there are
 two primary modes to export and deploy the generated classifier: by dumping
 it to disk or by pushing it to an onboarding server.  Please consult the
-`background usage <../image-classification.rst#background_usage>`_ for more specific arguments
+:ref:`image-classification_usage` for more specific arguments
 but the examples below demonstrate basic capabilities.
 
 * `elephant.jpg <https://www.pexels.com/photo/animal-big-ear-elephant-133393/>`_

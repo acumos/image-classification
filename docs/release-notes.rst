@@ -16,7 +16,7 @@
 .. limitations under the License.
 .. ===============LICENSE_END=========================================================
 
-.. _release_notes:
+.. _release_notes_image-classification:
 
 ==================================
 Image Classification Release Notes
