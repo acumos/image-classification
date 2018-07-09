@@ -16,11 +16,11 @@
 .. limitations under the License.
 .. ===============LICENSE_END=========================================================
 
-.. _demonstration:
+.. _demonstration-image_classification:
 
-==================================
-Demonstrations: Tutorial for Demos
-==================================
+========================================================
+Demonstrations: Tutorial for Image Classification Models
+========================================================
 
 To extend functionality into a usable web-demo, a second set of assets were
 created within the ``web_demo`` directory.
@@ -44,7 +44,7 @@ Browser Interaction
 Most browsers should have no
 CORS or other cross-domain objections to dropping the file ``image-classes.html``
 into the browser and accesing a locally hosted server API, as configured
-in `the deployment tutorial <deployment.rst>`_.
+in :ref:`deployment_image-classification`.
 
 Open-source hosted run
 ----------------------
@@ -81,7 +81,7 @@ or simply update the primary classification URL on the page itself during runtim
 This demo utilizes the `javascript protobuf library <https://github.com/dcodeIO/ProtoBuf.js/>`_
 to encode parameters into proto binaries in the browser.
 
-** NOTE ** One version of the face model's protobuf schema is included with
+** NOTE ** One version of the model's protobuf schema is included with
 this web page, but it may change over time.  If you receive encoding errors
 or unexpected results, please verify that your target model and this web page
 are using the same ``.proto`` file.
@@ -89,7 +89,6 @@ are using the same ``.proto`` file.
 * confirm that your target docker instance is configured and running
 * download this directory to your local machine
     * confirm the host port and classification service URL in the file ``image-classes.js``
-    * modify the ``protoDefault`` setting to be 1
 
 .. code:: bash
 
@@ -104,7 +103,7 @@ are using the same ``.proto`` file.
 
 Special decoding example
 ------------------------
-In ``protobuf`` mode, you can also download a binary, encoded version of the last
+You can also download a binary, encoded version of the last
 image or output that was sent to the remote service.  When available, the **Download Encoded Message**
 button will be enabled and a binary file will be generated in the browser.
 

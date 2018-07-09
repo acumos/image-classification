@@ -16,7 +16,7 @@
 .. limitations under the License.
 .. ===============LICENSE_END=========================================================
 
-.. _tutorials:
+.. _tutorials-image_classification:
 
 =========
 Tutorials

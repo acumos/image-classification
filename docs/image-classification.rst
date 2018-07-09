@@ -16,7 +16,7 @@
 .. limitations under the License.
 .. ===============LICENSE_END=========================================================
 
-.. _background:
+.. _image-classification:
 
 |Build Status|
 
@@ -44,7 +44,7 @@ and utilizes the
 At time of writing,
 this sample does not support retraining.
 
-.. _background_usage:
+.. _image-classification_usage:
 
 Usage
 -----
@@ -65,7 +65,7 @@ classification scores, as illustrated in the model image.
 
 Once deployed, you can quickly jump to the
 `default webhost page <http://htmlpreview.github.io/?https://github.com/acumos/image-classification/blob/master/web_demo/image-classes.html>`_
-and point to your model for a demo; see `demonstration <tutorials/demonstration.rst>`_ in the `tutorials <tutorials/index.rst>`_.
+and point to your model for a demo; see :ref:`demonstration-image_classification` in the :ref:`tutorials-image_classification`.
 
 Performance
 ===========
@@ -90,14 +90,13 @@ This section is useful for source-based installations and is not generally inten
 for catalog documentation.
 
 Package dependencies
--------------------
+--------------------
 Package dependencies for the core code and testing have been flattened into a
 single file for convenience. Instead of installing this package into your
 your local environment, execute the command below.
 
 **Note:** If you are using an `anaconda-based environment <https://anaconda.org>`_,
 you may want to try installing with conda first and then pip.
-to mixing mixing package stores.
 
 .. code:: bash
 
@@ -162,12 +161,12 @@ script and has the following arguments.
 
 Example Usages
 ==============
-Please consult the `tutorials <tutorials/index.rst>`_ dirctory for usage examples.
+Please consult the :ref:`tutorials-image_classification` directory for usage examples.
 
 Release Notes
 =============
-The `release notes <release-notes.rst>`_ catalog additions and modifications
+The :ref:`release_notes_image-classification` catalog additions and modifications
 over various version changes.
 
-.. |Build Status| image:: https://jenkins.acumos.org/buildStatus/icon?job=image-classification-tox-verify-master
-   :target: https://jenkins.acumos.org/job/image-classification-tox-verify-master/
+.. |Build Status| image:: https://jenkins.acumos.org/buildStatus/icon?job=image-mood-classifier-tox-verify-master
+   :target: https://jenkins.acumos.org/job/image-mood-classifier-tox-verify-master/
