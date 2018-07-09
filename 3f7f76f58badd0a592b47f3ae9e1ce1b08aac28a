@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c113db92_afce4030",
+        "filename": "docs/image-classification.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 94
+      },
+      "writtenOn": "2018-07-09T17:46:02Z",
+      "side": 1,
+      "message": "these don\u0027t link to anything - I know you fixed this kind of issue in your other projects\u0027 docs  and below in the Tutorials link.",
+      "range": {
+        "startLine": 68,
+        "startChar": 40,
+        "endLine": 68,
+        "endChar": 129
+      },
+      "revId": "3f7f76f58badd0a592b47f3ae9e1ce1b08aac28a",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
