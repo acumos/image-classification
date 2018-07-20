@@ -84,6 +84,7 @@ Example for evaluation of a multiple image with all results, saving predictions.
 
     python image_classifier/classify_image.py -m model.h5 -I data/image_list.txt -f keras -p data/features.csv -l data/keras_class_names.txt -n 0
 
+.. _deployment_image-classification-model_runner:
 
 Model Runner: Using the Client Library
 ======================================

@@ -75,6 +75,22 @@ directory (assuming you're running python3).
 Afterwards, just point your browser at ``http://localhost:5000/image-classes.html``.
 
 
+Usage of protobuf binaries for testing
+--------------------------------------
+
+Binary (protobuf encoded) data can be downloaded from the web page or directly with curl.
+Two demonstration binaries have been included in the source repository for testing, as
+captured from the :ref:`demonstration-image_classification_running_example` image below.
+	
+- ``protobuf.Image.bin`` - a protobuf-encoded image of a coastal-lapse video
+- ``protobuf.ImageTagSet.bin`` - a protobuf-encoded classification tag set for the coastal-lapse video
+	
+	
+Within the webpage demo, simply select the correct protobuf method and then drag and
+drop the binary file into the ``Protobuf Payload Input`` file uploader.  It will be
+immediately uploaded through javascript to your specified ``Transform Url``.
+	
+
 Example image classification demo (docker and protobuf)
 =======================================================
 To customize this demo, one should change either the included javascript
@@ -98,6 +114,7 @@ are using the same ``.proto`` file.
 * view the page ``image-classes.html`` in a Crome or Firefox browser
 * you can switch between a few sample images or upload your own by clicking on the buttons below the main image window
 
+.. _demonstration-image_classification_running_example:
 .. image:: example_running.jpg
     :alt: example web application classifying tigers video
     :width: 200
