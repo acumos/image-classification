@@ -29,6 +29,7 @@
  E. Zavesky 10/19/17 adapted for video+image
  E. Zavesky 05/05/18 adapted for row-based image and other results
  E. Zavesky 05/30/18 adapted for single image input, github preview, safe posting (forked from model-specific code)
+ E. Zavesky 07/11/18 allow proto type grouping, proto text file download, binary chunk upload (as proto)
  */
 
 
@@ -43,7 +44,9 @@ function demo_init(objSetting) {
         classificationServer: getUrlParameter('url-image'), // default to what's in our url prameter
         protoObj: null,   // to be back-filled after protobuf load {'root':obj, 'methods':{'xx':{'typeIn':x, 'typeOut':y}} }
         protoPayloadInput: null,   //payload for encoded message download (if desired)
+        protoInputName: 'in',  //input name for proto creation
         protoPayloadOutput: null,   //payload for encoded message download (if desired)
+        protoOutputName: 'out',  //output name for proto download
         protoKeys: null,  // currently selected protobuf method (if any)
         frameCounter: 0,
         totalFrames: 900000,	// stop after this many frames just to avoid sending frames forever if someone leaves page up
@@ -52,10 +55,14 @@ function demo_init(objSetting) {
         maxSrcVideoWidth: 512,	// maximum image width for processing
         serverIsLocal: true,    // server is local versus 'firewall' version
         imageIsWaiting: false,  // blocking to prevent too many queued frames
+
         // functional customizations for each demo
         documentTitle: "Protobuf Demo",
         mediaList: [],        //relative URLs of media files
         protoList: [],        //relative URLs of proto files to include
+        domHeaders: { "Content-type": "text/plain;charset=UTF-8" },   //defaults for headers
+        // TODO: should be binary ideally, domHeaders: { "Content-type": "application/octet-stream;charset=UTF-8" },   //defaults for headers
+
         // Objects from DOM elements
         video: document.getElementById('srcVideo'),
         srcImgCanvas: document.getElementById('srcImgCanvas'),	// we have a 'src' source image
@@ -66,9 +73,12 @@ function demo_init(objSetting) {
         hd.video.addEventListener("loadedmetadata", newVideo);
     }
 
+    $("#protoSource").prop("disabled",true).click(downloadBlobProto);
     $("#protoInput").prop("disabled",true).click(downloadBlobIn);
     $("#protoOutput").prop("disabled",true).click(downloadBlobOut);
     $("#resultText").hide();
+    $("#protoBinary").change(doPostBinaryFile);
+
 
     //add text input tweak
     $("#serverUrl").change(function() {
@@ -84,6 +94,7 @@ function demo_init(objSetting) {
     hd.protoObj = {};  //clear from last load
     $.each(hd.protoList, function(idx, protoTuple) {     //load relevant protobuf tuples
         protobuf_load.apply(this, protoTuple);      //load each file independently
+        $("#protoSource").prop("disabled",false);
     });
 
     // add buttons to change video
@@ -132,7 +143,10 @@ function protobuf_load(pathProto, forceSelect) {
         var numMethods = domSelect.children().length;
         $.each(root.nested, function(namePackage, objPackage) {    // walk all
             if ('Model' in objPackage && 'methods' in objPackage.Model) {    // walk to model and functions...
-                var typeSummary = {'root':root, 'methods':{} };
+                var typeSummary = {'root':root, 'methods':{}, 'path':pathProto };
+                var fileBase = pathProto.split(/[\\\/]/);       // added 7/11/18 for proto context
+                fileBase = fileBase[fileBase.length - 1];
+                var domGroup = $("<optgroup label='"+fileBase+" - "+namePackage+"' >");
                 $.each(objPackage.Model.methods, function(nameMethod, objMethod) {  // walk methods
                     typeSummary['methods'][nameMethod] = {};
                     typeSummary['methods'][nameMethod]['typeIn'] = namePackage+'.'+objMethod.requestType;
@@ -150,9 +164,10 @@ function protobuf_load(pathProto, forceSelect) {
                     if (forceSelect) {
                         domOpt.attr("selected", 1);
                     }
-                    domSelect.append(domOpt);
+                    domGroup.append(domOpt);
                     numMethods++;
                 });
+                domSelect.append(domGroup);
                 $(document.body).data('hdparams').protoObj[namePackage] = typeSummary;   //save new method set
                 $("#protoContainer").show();
             }
@@ -344,15 +359,11 @@ function doPostImage(srcCanvas, dstDiv, dstImg, imgPlaceholder) {
 
     hd.imageIsWaiting = true;
     var domHeaders = {};
-    dstDiv = $(dstDiv);
-    $("#postSpinner").remove();     //erase previously existing one
-    dstDiv.append($("<div id='postSpinner' class='spinner'>&nbsp;</div>"));
-    if (dstImg)     //convert to jquery dom object
-        dstImg = $(dstImg);
 
     //console.log("[doPostImage]: Selected method ... '"+typeInput+"'");
     if (hd.protoKeys) {     //valid protobuf type?
         var blob = dataURItoBlob(dataURL, true);
+        domHeaders = $.extend({}, hd.domHeaders);       //rewrite with defaults
 
         // fields from .proto file at time of writing...
         // message Image {
@@ -369,7 +380,7 @@ function doPostImage(srcCanvas, dstDiv, dstImg, imgPlaceholder) {
         var errMsg = msgInput.verify(inputPayload);
         if (errMsg) {
             var strErr = "[doPostImage]: Error during type verify for object input into protobuf method. ("+errMsg+")";
-            dstDiv.empty().html(strErr);
+            $(dstDiv).empty().html(strErr);
             console.log(strErr);
             throw Error(strErr);
         }
@@ -383,9 +394,10 @@ function doPostImage(srcCanvas, dstDiv, dstImg, imgPlaceholder) {
         //  protoc --decode=mMJuVapnmIbrHlZGKyuuPDXsrkzpGqcr.FaceImage model.proto < protobuf.bin
         $("#protoInput").prop("disabled",false);
         hd.protoPayloadInput = sendPayload;
+        // got the input name, from the type, use it here
+        hd.protoInputName = hd.protoObj[hd.protoKeys[0]]['methods'][hd.protoKeys[1]]['typeIn'];
+        hd.protoOutputName = hd.protoObj[hd.protoKeys[0]]['methods'][hd.protoKeys[1]]['typeOut'];
 
-        //request.setRequestHeader("Content-type", "application/octet-stream;charset=UTF-8");
-        domHeaders["Content-type"] = "text/plain;charset=UTF-8";
         //request.responseType = 'arraybuffer';
     }
     else if (hd.protoList.length) {
@@ -408,6 +420,42 @@ function doPostImage(srcCanvas, dstDiv, dstImg, imgPlaceholder) {
             sendPayload.append("myList", "5");	// limit the number of classes (max 1000)
         }
     }
+    doPostPayload(sendPayload, domHeaders, dstDiv, dstImg, imgPlaceholder);
+}
+
+
+function doPostBinaryFile(e)  {
+    // https://stackoverflow.com/a/10811427
+    // https://stackoverflow.com/a/17512132
+    var fileReader = new FileReader();
+    fileReader.onload = function(e) {
+        console.log("[doPostBinaryFile]: Sending uploaded binary file of length "+e.target.result.byteLength);
+        doPostBlob(e.target.result);
+    };
+    var fileLocal = $(this)[0].files[0];
+    fileReader.readAsArrayBuffer(fileLocal);
+
+    //usage: $("#ingredient_file").change(doPostBinaryFile);
+}
+
+function doPostBlob(blobData)
+{
+    doPostPayload(blobData, null, '#resultsDiv', '#destImg', null);
+}
+
+
+function doPostPayload(sendPayload, domHeaders, dstDiv, dstImg, imgPlaceholder)
+{
+    var hd = $(document.body).data('hdparams');
+    hd.imageIsWaiting = true;
+
+    dstDiv = $(dstDiv);
+    $("#postSpinner").remove();     //erase previously existing one
+    dstDiv.append($("<div id='postSpinner' class='spinner'>&nbsp;</div>"));
+    if (dstImg)     //convert to jquery dom object
+        dstImg = $(dstImg);
+    if (!domHeaders)    //pull existing headers from config
+        domHeaders = $(document.body).data('hdparams').domHeaders;
 
     //$(dstImg).addClaas('workingImage').siblings('.spinner').remove().after($("<span class='spinner'>&nbsp;</span>"));
     $.ajax({
@@ -493,12 +541,25 @@ function BlobToDataURI(data, mime) {
 
 // ----- diagnostic tool to download binary blobs ----
 function downloadBlobOut() {
-    return downloadBlob($(document.body).data('hdparams').protoPayloadOutput, "protobuf.out.bin");
+    var hd = $(document.body).data('hdparams');
+    return downloadBlob(hd.protoPayloadOutput, "protobuf."+hd.protoOutputName+".bin");
 }
 
 function downloadBlobIn() {
-    return downloadBlob($(document.body).data('hdparams').protoPayloadInput, "protobuf.in.bin");
+    var hd = $(document.body).data('hdparams');
+    return downloadBlob(hd.protoPayloadInput, "protobuf."+hd.protoInputName+".bin");
 }
+
+function downloadBlobProto() {
+    var namePackage = $(document.body).data('hdparams').protoKeys[0];
+    var pathProto = $(document.body).data('hdparams').protoObj[namePackage]['path'];
+    protobuf.util.fetch(pathProto, {binary:true}, function(statusStr, data) {
+        var fileBase = pathProto.split(/[\\\/]/);       // added 7/11/18 for proto context
+        fileBase = fileBase[fileBase.length - 1];
+        return downloadBlob(data, fileBase, "text/plain");
+    });
+}
+
 
 //  https://stackoverflow.com/a/33622881
 function downloadBlob(data, fileName, mimeType) {
