@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cd9ba9b1_d54abd66",
+        "filename": "docs/tutorials/deployment.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2018-07-21T09:13:38Z",
+      "side": 1,
+      "message": "This is just a comment? or is something missing here?",
+      "revId": "40c84e8dff353d49ed8624d6790c5500bfe68455",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
