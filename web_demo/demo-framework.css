@@ -10,9 +10,7 @@
   You may obtain a copy of the License at
 
   http://www.apache.org/licenses/LICENSE-2.0
- 
-  http://www.apache.org/licenses/LICENSE-2.0
- 
+
   This file is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
@@ -24,25 +22,35 @@ body {
   font-family:Trebuchet MS,Tahoma,Verdana,Arial,sans-serif;
 }
 
-#resultsDiv {
-  position: absolute;
-  top: 100px;
-  left: 900px;
-  color: #FFF;
-  text-align: center;
-  font-size: 20px;
-  background-color: rgba(221, 221, 221, 0.8);
-  width: 220px;
-  padding: 10px 0;
-  z-index: 2147483647;
+
+hr {
+    margin: 10px 0;
+    width:100%;
+    clear: both;
+    float: none;
 }
 
 #srcVideo {
   z-index: 1;
 }
 .videoWin {
-  height: 480;
-  widgh: 853;
+    margin: 5px;
+    height: 80px;
+    width: 120px;
+    position: absolute;
+    /* max-width:100%;
+    max-height:300px; */
+    margin-left: auto;
+    margin-right: auto;
+    /* width: auto;
+    height: auto; */
+    border: solid #888 3px;
+    background: rgba(221, 221, 221, 0.8); // #DDD;
+}
+
+
+.workingImage {
+    opacity: 0.7;
 }
 
 table {
@@ -60,25 +68,17 @@ th, .header {
   color: white;
 }
 
-
-tr:nth-child(even){
-  background-color: #ababab;
+.tableConfig td:nth-child(odd) {
+    text-align:right;
 }
 
-button {
-	background-color: #dedede; color: black; /* Gray */
-    border: none;
-    color: black;
-    padding: 8px 16px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 4px 2px;
-    -webkit-transition-duration: 0.4s; /* Safari */
-    transition-duration: 0.4s;
-    cursor: pointer;
-	border-radius: 6px;
+tr:nth-child(even){
+  background-color: #c8c8c8;
+}
+
+br {
+    float: none;
+    clear: both;
 }
 
 .tiny {
@@ -86,10 +86,63 @@ button {
     text-transform: uppercase;
 }
 
-.spinner {
+.mediaRibbon div {
+    float:left;
+    clear: none;
+    padding: 2px;
+    border: solid #888 3px;
+    margin: 2px;
+    width: 40%;
+    background: rgba(221, 221, 221, 0.8); // #DDD;
+}
+
+#sourceRibbon div {
+    width:15%;
+}
+
+#sourceRibbon div:hover, #sourceRibbon div.selected {
+    border: solid blue 3px;
+    background: #BBB;
+}
+
+
+.mediaRibbon div img, .mediaRibbon div canvas {
+    display: block;
+    max-width:100%;
+    max-height:300px;
+    margin-left: auto;
+    margin-right: auto;
+    width: auto;
+    height: auto;
+}
+
+
+#sourceRibbon div img, #sourceRibbon div canvas {
+    max-height:95px;
+}
+
+.mediaRibbon div span {
+    font-size: small;
+    text-align: center;
+    clear: both;
+    display: block;
+}
+
+.mediaRibbon div .colorblock {
+    height: 5px;
+    width: 5px;
+    border: 1px solid black;
+    background-color: white;
+}
+
+#postSpinner {
     background-image: url('spinnerbar.gif');
     background-size:     contain;
     background-repeat:   no-repeat;
     height: 100px;
     background-position: center center;
+    border: none;
+    width: 98%;
+    margin-left: auto;
+    margin-right: auto;
 }

@@ -21,6 +21,7 @@
 video-list.js - list of videos to select for processing
 David Gibbon 1/10/14, 8/1/17
 Eric Zavesky 3/23/18 video switch-up, add attribution
+Eric Zavesky 7/27/18 slight schema change, add image sample as first
 
 Format is video URL, name to show up in UI, and (optional) frame rate (frames per second, default 15)
 Note that cross origin may prohibit external URLs
@@ -31,33 +32,44 @@ var videos = [
 	//  'name': 'Camera'
 	//},
 	{
-	  'url': 'video/stock-footage-city-cars.mp4',
-	  'source': 'https://videos.pexels.com/videos/cars-on-the-road-854745',
-	  'name': 'city-cars'
+        'img': 'video/stock-footage-bicycles.jpg',
+        'source': 'https://videos.pexels.com/videos/mountain-bikers-during-daytime-857083',
+        'name': 'bikes (image)'
+    },
+    {
+        'movie': 'video/stock-footage-city-cars.mp4',
+        'img': 'video/stock-footage-city-cars.jpg',
+        'source': 'https://videos.pexels.com/videos/cars-on-the-road-854745',
+        'name': 'city-cars'
 	},
 	{
-	  'url': 'video/stock-footage-bicycles.mp4',
-	  'source': 'https://videos.pexels.com/videos/mountain-bikers-during-daytime-857083',
-	  'name': 'bikes'
+        'movie': 'video/stock-footage-bicycles.mp4',
+        'img': 'video/stock-footage-bicycles.jpg',
+        'source': 'https://videos.pexels.com/videos/mountain-bikers-during-daytime-857083',
+        'name': 'bikes'
 	},
 	{
-	  'url': 'video/stock-footage-coast-time.mp4',
-      'source': 'https://videos.pexels.com/videos/sunset-by-the-sea-857056',
-	  'name': 'costal-lapse'
+        'movie': 'video/stock-footage-coast-time.mp4',
+        'img': 'video/stock-footage-coast-time.jpg',
+        'source': 'https://videos.pexels.com/videos/sunset-by-the-sea-857056',
+        'name': 'costal-lapse'
+	},
+	// {
+    //     'img': 'video/stock-footage-squirrel.jpg',
+    //     'movie': 'video/stock-footage-squirrel.mp4',
+    //     'source': 'https://videos.pexels.com/videos/squirrel-eating-855213',
+    //     'name': 'squirrel'
+	// },
+	{
+        'img': 'video/stock-footage-dogs.jpg',
+        'movie': 'video/stock-footage-dogs.mp4',
+        'source': 'https://videos.pexels.com/videos/dogs-playing-853846',
+        'name': 'park-dogs'
 	},
 	{
-	  'url': 'video/stock-footage-squirrel.mp4',
-      'source': 'https://videos.pexels.com/videos/squirrel-eating-855213',
-	  'name': 'squirrel'
-	},
-	{
-	  'url': 'video/stock-footage-dogs.mp4',
-      'source': 'https://videos.pexels.com/videos/dogs-playing-853846',
-	  'name': 'park-dogs'
-	},
-	{
-	  'url': 'video/stock-footage-scuba.mp4',
-      'source': 'https://videos.pexels.com/videos/paddle-surfing-and-scuba-diving-video-854387',
-	  'name': 'scuba'
+        'movie': 'video/stock-footage-scuba.mp4',
+        'img': 'video/stock-footage-scuba.jpg',
+        'source': 'https://videos.pexels.com/videos/paddle-surfing-and-scuba-diving-video-854387',
+        'name': 'scuba'
 	},
 ];

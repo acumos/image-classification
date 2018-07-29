@@ -109,14 +109,14 @@ are using the same ``.proto`` file.
 
 .. code:: bash
 
-    urlDefault: "http://localhost:8886/classify",
+    classificationServer: "http://localhost:8886/classify",
 
 * view the page ``image-classes.html`` in a Crome or Firefox browser
 * you can switch between a few sample images or upload your own by clicking on the buttons below the main image window
 
 .. _demonstration-image_classification_running_example:
 .. image:: example_running.jpg
-    :alt: example web application classifying tigers video
+    :alt: example web application classifying costal video
     :width: 200
 
 Special decoding example
@@ -127,10 +127,26 @@ button will be enabled and a binary file will be generated in the browser.
 
 .. code:: bash
 
-    protoc --decode=ZmazgwcYOzRPSlAKlNLcoITKjByZchTo.ImageTagSet model.proto < protobuf.out.bin
-    protoc --decode=ZmazgwcYOzRPSlAKlNLcoITKjByZchTo.Image model.proto < protobuf.in.bin
+    protoc --decode=ZmazgwcYOzRPSlAKlNLcoITKjByZchTo.ImageTagSet model.scene.proto < protobuf.out.bin
+    protoc --decode=ZmazgwcYOzRPSlAKlNLcoITKjByZchTo.Image model.scene.proto < protobuf.in.bin
 
 **NOTE** The specific package name may have changed since the time of writing,
 so be sure to check the contents of the current ``.proto`` file.
+
+
+Reuse with object detectors
+---------------------------
+This framework can be used to demonstrate other object detector and manipulation models 
+as well.  Although the source for the model is not included in this repo, an object
+detection model based on the `common Objects in Context (COCO) <http://cocodataset.org>`_ 
+dataset was created and tested with this content.  The example below shows use of the
+relevant endpoint and ``.proto`` file (also included in this sample).
+
+.. _demonstration-image_classification_running_example_obj:
+.. image:: example_running_object.jpg
+    :alt: example web application classifying bicycle image
+    :width: 200
+
+
 
 
