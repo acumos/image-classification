@@ -26,6 +26,7 @@ Image Classification Release Notes
 =====
 
 * Clean up tutorial documentation naming and remove deprecated swagger demo app
+* Rework demonstration page to allow image upload and support object-based detection
 
 
 0.5.2

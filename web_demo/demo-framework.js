@@ -30,6 +30,7 @@
  E. Zavesky 05/05/18 adapted for row-based image and other results
  E. Zavesky 05/30/18 adapted for single image input, github preview, safe posting (forked from model-specific code)
  E. Zavesky 07/11/18 allow proto type grouping, proto text file download, binary chunk upload (as proto)
+ E. Zavesky 07/27/18 update for use of video list for auto-population of ribbon with div, not image; add rect drawing function
  */
 
 
@@ -55,6 +56,8 @@ function demo_init(objSetting) {
         maxSrcVideoWidth: 512,	// maximum image width for processing
         serverIsLocal: true,    // server is local versus 'firewall' version
         imageIsWaiting: false,  // blocking to prevent too many queued frames
+        colorSet: [ "#FF0000", "#FFFF00", "#00FF00", "#00FFFF", "#0000FF", "#FF00FF", 
+                    "#FFBFBF", "#FFFFBF", "#BFFFBF", "#BFFFFF", "#BFBFFF", "#FFBFFF"],  // colors for rect and highlight
 
         // functional customizations for each demo
         documentTitle: "Protobuf Demo",
@@ -66,12 +69,23 @@ function demo_init(objSetting) {
         // Objects from DOM elements
         video: document.getElementById('srcVideo'),
         srcImgCanvas: document.getElementById('srcImgCanvas'),	// we have a 'src' source image
+        srcImgCanvasBack: null,  // our back-frame to switch canvas
+        srcImgCanvasActive: 0,
     }));
 
     var hd = $(document.body).data('hdparams');
     if (hd.video) {
         hd.video.addEventListener("loadedmetadata", newVideo);
     }
+    //create clone of canvas for better show of data
+    if (hd.srcImgCanvas) {
+        var domCanvas = $(hd.srcImgCanvas);
+        var idCopy = domCanvas.attr('id')+'_clone';
+        domCanvas.clone().attr('id', idCopy).appendTo(domCanvas.parent());
+        hd.srcImgCanvasBack = document.getElementById(idCopy);
+        $(hd.srcImgCanvasBack).hide();        
+    }
+
 
     $("#protoSource").prop("disabled",true).click(downloadBlobProto);
     $("#protoInput").prop("disabled",true).click(downloadBlobIn);
@@ -97,15 +111,38 @@ function demo_init(objSetting) {
         $("#protoSource").prop("disabled",false);
     });
 
-    // add buttons to change video
+    // add div to change video or image source
     $.each(hd.mediaList, function(key) {
-        //TODO: integrarte as DIV instead of button
-        var button = $('<button/>').text(videos[key].name).attr('movie', videos[key].url);
-        $("#sourceRibbon").append(button);
+        //var button = $('<button/>').text(videos[key].name).attr('movie', videos[key].url);
+        var div_area = $('<div/>');
+        var img_dom = $("<img src='"+hd.mediaList[key].img+"' />");
+        if (hd.mediaList[key].movie) {
+            img_dom.attr("movie", hd.mediaList[key].movie);
+        }
+        div_area.append(img_dom);
+        div_area.append($("<span />").append($("<a href='"+hd.mediaList[key].source+"' target='_new' />").text(hd.mediaList[key].name)));
+        $("#sourceRibbon").append(div_area);
+    });
+    
+    //add the file upload capability
+    var div_area = $('<div/>');
+    div_area.append($("<label />").text("Upload Image").append("<br />"));
+    div_area.append($("<input id='imageLoader' name='imageLoader' type='file' />"));
+    $("#sourceRibbon").append(div_area);
+    $("#imageLoader").change(function(e) {
+        clearInterval(hd.frameTimer);	// stop the processing
+        hd.video.pause();
+        $(hd.video).hide();
+        // $(hd.srcImgCanvas).show();
+        var reader = new FileReader();
+        reader.onload = function(event){
+            switchImage(event.target.result);
+        }
+        reader.readAsDataURL(e.target.files[0]);
     });
 
     // add buttons to change video or image
-	$("#sourceRibbon").children("div,button").click(function() {
+	$("#sourceRibbon").children("div").click(function() {
         var $this = $(this);
         $this.siblings().removeClass('selected'); //clear other selection
         $this.addClass('selected');
@@ -125,13 +162,31 @@ function demo_init(objSetting) {
         }
         else {
             $(hd.video).hide();
-            $(srcImgCanvas).show();
-            if (objImg)
+            // $(hd.srcImgCanvas).show();
+            if (objImg) 
                 switchImage(objImg.attr('src'));
         }
 	}).first().click();
 }
 
+// trick for two-canvas fetch (essentially using a frame buffer https://en.wikipedia.org/wiki/Framebuffer#Page_flipping)
+function canvas_get(getActive=true) {
+    var hd = $(document.body).data('hdparams');
+    if (getActive)
+        return (hd.srcImgCanvasActive == 0) ? hd.srcImgCanvas : hd.srcImgCanvasBack;
+    return (hd.srcImgCanvasActive != 0) ? hd.srcImgCanvas : hd.srcImgCanvasBack;
+}
+
+// flip display of the two canvases 
+function canvas_flip() {
+    var hd = $(document.body).data('hdparams');
+    var canvasHide = canvas_get(true);
+    var canvasShow = canvas_get(false);
+    hd.srcImgCanvasActive = (hd.srcImgCanvasActive+1) % 2;
+    $(canvasHide).hide();
+    $(canvasShow).show();
+    return canvasShow;
+}
 
 function protobuf_load(pathProto, forceSelect) {
     protobuf.load(pathProto, function(err, root) {
@@ -235,7 +290,7 @@ function switchVideo(movieAttr) {
 
     // Set the video source based on URL specified in the 'videos' list, or select camera input
     $(hd.video).show();
-    $(srcImgCanvas).hide();
+    // $(hd.srcImgCanvas).hide();
     if (movieAttr == "Camera") {
         var constraints = {audio: false, video: true};
         navigator.mediaDevices.getUserMedia(constraints)
@@ -269,9 +324,10 @@ function newVideo() {
 	if (pwidth > hd.maxSrcVideoWidth) {
 		pwidth = hd.maxSrcVideoWidth;
 		pheight = Math.floor((pwidth / hd.video.videoWidth) * pheight);	// preserve aspect ratio
-	}
-	hd.srcImgCanvas.width = pwidth;
-	hd.srcImgCanvas.height = pheight;
+    }
+    var canvasAct = canvas_get();
+	canvasAct.width = pwidth;
+	canvasAct.height = pheight;
 
     updateProto("protoMethod");
     hd.frameTimer = setInterval(nextFrame, hd.frameInterval); // start the processing
@@ -290,7 +346,7 @@ function nextFrame() {
 }
 
 function switchImage(imgSrc, isVideo) {
-    var canvas = $(document.body).data('hdparams')['srcImgCanvas'];
+    var canvas = canvas_get(false);
     if (!isVideo) {
         var img = new Image();
         img.crossOrigin = "Anonymous";
@@ -489,6 +545,7 @@ function doPostPayload(sendPayload, domHeaders, dstDiv, dstImg, imgPlaceholder)
             //  dstImg: the dom element of a destination image (if available)
             //  imgPlaceholder: the exported canvas image from last source
             //
+            canvas_flip();
             var returnState = processResult(data, dstDiv, hd.protoKeys, dstImg, imgPlaceholder);
             hd.imageIsWaiting = false;
             return returnState;
@@ -601,6 +658,35 @@ function handleImage(e){
         switchImage(event.target.result);
     }
     reader.readAsDataURL(e.target.files[0]);
+}
+
+
+// draw a region in the source canvas 
+function canvas_rect(clear_first, r_left, r_top, r_width, r_height, r_color) {
+    if (!r_color) r_color = "blue";
+
+    var line_width = 4;
+    var src_canvas = canvas_get();
+    
+    var hd = $(document.body).data('hdparams');
+    var ctx = src_canvas.getContext('2d');
+    if (clear_first) {
+        ctx.clearRect(0, 0, src_canvas.width, src_canvas.height);
+    }
+
+    //key to starting different colors
+    ctx.beginPath();
+    ctx.lineWidth=line_width;
+    var offsWidth = Math.floor(line_width/2);
+    ctx.strokeStyle=r_color;
+    ctx.moveTo(r_left+offsWidth, r_top+offsWidth);
+    ctx.lineTo(r_left+offsWidth+r_width, r_top+offsWidth);
+    ctx.lineTo(r_left+offsWidth+r_width, r_top+offsWidth+r_height);
+    ctx.lineTo(r_left+offsWidth, r_top+offsWidth+r_height);
+    ctx.lineTo(r_left+offsWidth, r_top+offsWidth);
+    ctx.stroke();
+    //ctx.strokeRect(r_left+line_width, r_top+line_width, r_width, r_height);
+    //console.log("[canvas_rect]: "+r_left+","+r_top+"x"+r_width+","+r_height+", color:"+r_color);
 }
 
 

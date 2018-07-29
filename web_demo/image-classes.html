@@ -25,37 +25,50 @@
 image-classes.html - Demonstrate an image classification service via DNN
 D. Gibbon 8/1/17
 To run from files, and to access local camera, launch chrome from  the command line with: --allow-file-access-from-files --disable-web-security
+E. Zavesky 7/28/18
+Rewrite to utilize simple image-based processing steps.
 -->
 <title>Image Classification</title>
-<link rel="stylesheet" type="text/css" href="image-classes.css" />
+<link rel="stylesheet" type="text/css" href="demo-framework.css" />
 </head>
 <body>
-<video class="videoWin" id="srcVideo" muted controls crossorigin>
-<source id="mp4" src="video/unknown.mp4" type="video/mp4"></source>
-Your browser does not support the video tag. Please use Chrome or Firefox.
-</video>
-<div id="resultsDiv"><div class='header'>Image Classification</div></div>
-<br/>
-<div id='videoSourceSite'></div>
-<hr />
-<div id='sourceRibbon'></div>
-<hr />
+
+    <div class="mediaRibbon">
+        <div>
+            <video class="videoWin" id="srcVideo" width="120" height="85" muted controls crossorigin>
+                <source id="mp4" src="video/unknown.mp4" type="video/mp4"></source>
+                Your browser does not support the video tag. Please use Chrome or Firefox.
+            </video>
+            <span>post-processed image</span>
+            <canvas id="srcImgCanvas" width="380" height="270" crossorigin></canvas>
+        </div>
+        <div id="resultsDiv">(classification results)</div>
+    </div>
+    <img id="destImg" width="380" height="270" style="display:none" crossorigin />
+
+    <br/>
+    <hr />
+    <div id="sourceRibbon" class="mediaRibbon">
+        <span class="tiny">Select an image for analysis or upload your own!</span><br />
+    </div>
+    <hr  />
+
 <form action="javascript:void(0);">
-<table class="tableConfig">
-    <tr><td><label for="serverUrl">Transform URL:</label></td>
-        <td><input type="text" name="serverUrl" id="serverUrl" size="60" />
-        <br /><span class="tiny"><em>Note: The endpoint url may be modified when a new method below is utilized.</em></span></td></tr>
-    <tr><td><label for="protoMethod">Protobuf Method:</label></td>
-        <td><select name="protoMethod" id="protoMethod" ><option value="">(disabled, not loaded)</option></select>
-        <button type="button" name="protoSource" id="protoSource" >Download Protobuf Source</button></td></tr>
-    <tr><td><label for="protoButton">Protobuf Message:</label></td>
-        <td><button type="button" name="protoInput" id="protoInput" >Download Encoded Input</button> -
-        <button type="button" name="protoOutput" id="protoOutput" >Download Encoded Response</button></td></tr>
-    <tr><td><label for="protoButton">Protobuf Payload Input:</label></td>
-        <td><input type="file" id="protoBinary" /> (triggers upload + post on selection)</td></tr>
-    <tr><td><span class="tiny"><strong>PRO TIP:</strong></span></td>
-        <td><span class="tiny">Add the query parameter <em><a href="." id="serverLink">url-image</a></em> to auto-load this URL.</span></td></tr>
-</table>
+    <table class="tableConfig">
+        <tr><td><label for="serverUrl">Transform URL:</label></td>
+            <td><input type="text" name="serverUrl" id="serverUrl" size="60" />
+            <br /><span class="tiny"><em>Note: The endpoint url may be modified when a new method below is utilized.</em></span></td></tr>
+        <tr><td><label for="protoMethod">Protobuf Method:</label></td>
+            <td><select name="protoMethod" id="protoMethod" ><option value="">(disabled, not loaded)</option></select>
+            <button type="button" name="protoSource" id="protoSource" >Download Protobuf Source</button></td></tr>
+        <tr><td><label for="protoButton">Protobuf Message:</label></td>
+            <td><button type="button" name="protoInput" id="protoInput" >Download Encoded Input</button> -
+            <button type="button" name="protoOutput" id="protoOutput" >Download Encoded Response</button></td></tr>
+        <tr><td><label for="protoButton">Protobuf Payload Input:</label></td>
+            <td><input type="file" id="protoBinary" /> (triggers upload + post on selection)</td></tr>
+        <tr><td><span class="tiny"><strong>PRO TIP:</strong></span></td>
+            <td><span class="tiny">Add the query parameter <em><a href="." id="serverLink">url-image</a></em> to auto-load this URL.</span></td></tr>
+    </table>
 </form>
 <hr width='100%' >
 <br/>Image classification using deep convolutional neural nets (CNNs) and the
@@ -71,7 +84,6 @@ The dataset consists of <a href="http://image-net.org/challenges/LSVRC/2014/brow
 <br/>
 <a href='http://www.research.att.com/sites/labs_research/video_media_analytics'>Video and Machine Learning Research</a>
 </div>
-<canvas id="srcImgCanvas" width="480" height="270" style="visibility:hidden;position:absolute;top:0;left:0" crossorigin></canvas>
 <!-- delay loading until last minute --->
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="protobuf/protobuf.min.js"></script>

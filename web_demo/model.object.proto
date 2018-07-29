@@ -1,0 +1,35 @@
+syntax = "proto3";
+package jLraBcSVxifmtKZUTNSlpwFakGsHFpKo;
+
+service Model {
+  rpc recognize (Image) returns (FoundObjectList);
+  rpc recognize_str (RecognizeStrIn) returns (RecognizeStrOut);
+}
+
+message Image {
+  string mime_type = 1;
+  bytes image_binary = 2;
+}
+
+message FoundObjectList {
+  repeated FoundObject FoundObjects = 1;
+}
+
+message FoundObject {
+  int64 image = 1;
+  int64 region = 2;
+  int64 left = 3;
+  int64 top = 4;
+  int64 width = 5;
+  int64 height = 6;
+  string tag = 7;
+  double score = 8;
+}
+
+message RecognizeStrIn {
+  bytes data = 1;
+}
+
+message RecognizeStrOut {
+  string value = 1;
+}

@@ -44,7 +44,7 @@ $(document).ready(function() {
     demo_init({
         classificationServer: urlDefault,
         mediaList: videos,
-        protoList: [["model.proto", true]]
+        protoList: [["model.scene.proto", true], ["model.object.proto", false]]
     });
 });
 
@@ -98,6 +98,8 @@ function processResult(data, dstDiv, methodKeys, dstImg, imgPlaceholder) {
             return false;
         }
         var objRecv = objOutput[nameRepeated];
+        
+        // hd.srcImgCanvas
 
         //grab the nested array type and print out the fields of interest
         //var typeNested = methodKeys[0]+"."+msgOutput.fields[nameRepeated].type;
@@ -119,16 +121,16 @@ function genClassTable (data, div) {
 	var limit = 100;
 	var minScore = 0.1; // don't display any scores less than this
 	$(div).empty();
-	var classTable = $('<table />').append($('<tr />')
+    var classHead = $('<tr />')
 				.append($('<th />').append('Class'))
-				.append($('<th />').append('Score'))
-				);
+                .append($('<th />').append('Score'));
+    var classBody = $("<tbody />");
 
     if ('results' in data) {
         $.each(data.results.tags, function(k, v) {
             if (count < limit && v.score >= minScore) {
                 var fade = (v.score > 1.0) ? 1 : v.score;	// fade out low confidence classes
-                classTable.append($('<tr />').css('opacity', fade)
+                classBody.append($('<tr />').css('opacity', fade)
                     .append($('<td />').append(v.tag))
                     .append($('<td />').append(parseFloat(v.score).toFixed(2)))
                     );
@@ -137,11 +139,17 @@ function genClassTable (data, div) {
         });
     }
     else {  //expecting flat data
+        var colorSet = $(document.body).data('hdparams')['colorSet'];
         $.each(data, function(i,v) {
             if (count < limit && v.score >= minScore) {
+                var colName = $('<td />').append(v.tag);
+                if (v.left && v.top) {  //valid bounding box examples?
+                    canvas_rect(false, v.left, v.top, v.width, v.height, colorSet[i % colorSet.length]);
+                    colName.append($("<div class='colorblock'/>").css("background-color", colorSet[i % colorSet.length]));
+                }
+
                 var fade = (v.score > 1.0) ? 1 : v.score;	// fade out low confidence classes
-                classTable.append($('<tr />').css('opacity', fade)
-                    .append($('<td />').append(v.tag))
+                classBody.append($('<tr />').css('opacity', fade).append(colName)
                     .append($('<td />').append(parseFloat(v.score).toFixed(2)))
                     );
                 count++;
@@ -149,9 +157,6 @@ function genClassTable (data, div) {
         });
     }
 
+    var classTable = $('<table />').append(classHead).append(classBody);
 	$(div).append(classTable);
 }
-
-
-
-
