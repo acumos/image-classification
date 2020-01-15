@@ -28,9 +28,6 @@ created within the ``web_demo`` directory.
 This web page sample uses an HTML5 player to play an mp4 video and submit its
 frames to an image classification service.
 
-**Video Copyrights May Apply** - the included sample videos may carry
-additional copyrights and are not meant for public resale or consumption.
-
 * `video/stock-footage-bicycles.mp4 <https://videos.pexels.com/videos/mountain-bikers-during-daytime-857083>`_
 * `video/stock-footage-city-cars.mp4 <https://videos.pexels.com/videos/cars-on-the-road-854745>`_
 * `video/stock-footage-coast-time.mp4 <https://videos.pexels.com/videos/sunset-by-the-sea-857056>`_
