@@ -22,6 +22,13 @@
 Image Classification Release Notes
 ==================================
 
+0.5.4 
+=====
+
+* Add the possibility to on-board a model with or without a license file 'ACUMOS-4056 <https://jira.acumos.org/browse/ACUMOS-4056>'_
+* Add the possibility to launch, or not, the Micro-service generation at the end of on-boarding 'ACUMOS-4056 <https://jira.acumos.org/browse/ACUMOS-4056>'_
+
+
 0.5.3
 =====
 
