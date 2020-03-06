@@ -28,7 +28,6 @@ import pandas as pd
 
 MODEL_NAME = 'image_classifier'
 
-
 def model_create_pipeline(path_model, path_label, top_n):
     from sklearn.pipeline import Pipeline
     import keras
@@ -128,11 +127,24 @@ def keras_evaluate(config):
             session.dump(model, MODEL_NAME, config['dump_model'], reqs)  # creates ./my-iris.zip
             taskComplete = True
 
-        if 'push_address' in config and 'auth_address' in config and config['push_address']:
-            from acumos.session import AcumosSession
-            session = AcumosSession(push_api=config['push_address'], auth_api=config['auth_address'])
-            print("Pushing new model to upload '{:}', auth '{:}'...".format(config['push_address'], config['auth_address']))
-            session.push(model, MODEL_NAME, reqs)  # creates ./my-iris.zip
+        if 'push_address' in config and config['push_address']: # and 'auth_address' in config and config['push_address']:
+            from acumos.session import AcumosSession,Options
+
+            if config['create_microservice']=='False' :
+                if config['license_path'] is not 'None' :
+                    opts=Options(create_microservice=False,license=config['license_path'])
+                else :
+                    opts=Options(create_microservice=False)
+
+            if config['create_microservice']=='True' :
+                if config['license_path'] is not 'None' :
+                    opts=Options(create_microservice=True,license=config['license_path'])
+                else :
+                    opts=Options(create_microservice=True)
+
+            session = AcumosSession(push_api=config['push_address']) #, auth_api=config['auth_address'])
+            print("Pushing new model to '{:}'".format(config['push_address'])) #,auth '{:}'...".format(config['push_address'], config['auth_address']))
+            session.push(model, MODEL_NAME, reqs, options=opts)
             taskComplete = True
 
     """
@@ -144,7 +156,6 @@ def keras_evaluate(config):
         # Load test image!
         img = ImageDecoder.get_processed_image_keras_file(config['image'])  # load image through keras
         # img = evaluate_image.get_processed_image_cv(config['image'])
-
         # Run prediction on test image
         model, model_path = inception_v4.create_model(weights='imagenet', include_top=True, model_path=model_path)
         preds = model.predict(img)
@@ -202,15 +213,25 @@ def main(config={}):
     submain.add_argument('-l', '--label_path', type=str, default='data/keras_class_names.txt', help="Path to class label file for output columns, unnamed if empty (i.e. data/keras_class_names.txt).")
     subopts.add_argument('-n', '--num_top_predictions', type=int, default=30, help='Display this many predictions. (0=disable)')
     subopts.add_argument('-a', '--push_address', help='server address to push the model (e.g. http://localhost:8887/v2/upload)', default=os.getenv('ACUMOS_PUSH', ""))
-    subopts.add_argument('-A', '--auth_address', help='server address for login and push of the model (e.g. http://localhost:8887/v2/auth)', default=os.getenv('ACUMOS_AUTH', ""))
+    subopts.add_argument('-s', '--create_microservice', type=str, default='True',help='start the microservice generation at the end of on-boarding or not (True/False)')
+    subopts.add_argument('-t', '--license_path', type=str, default='None',help='Absolute path to the license file')
+    #subopts.add_argument('-A', '--auth_address', help='server address for login and push of the model (e.g. http://localhost:8887/v2/auth)', default=os.getenv('ACUMOS_AUTH', ""))
     subopts.add_argument('-d', '--dump_model', help='dump model to a directory for local running', default='')
     config.update(vars(parser.parse_args()))  # pargs, unparsed = parser.parse_known_args()
+
+    microservice_value=['True', 'False']
+
+    try:
+       assert config['create_microservice'] in microservice_value
+    except AssertionError:
+       raise ValueError("create_microservice is a boolean parameter please fill it with True or False")
 
     if config['framework'] != 'keras':
         print("Sorry, at this time only the 'keras' framework is supported.")
         sys.exit(-1)
 
     # If you want to use a GPU set its index here
+
     if config['cuda_env']:
         os.environ['CUDA_VISIBLE_DEVICES'] = config['cuda_env']
 
