@@ -1,4 +1,5 @@
 # UUID                                                                                 	Group Name
 #
 42f0c83244389e408b42fa668348002012ecba46                                               	GitHub Replication
+600ce84a489528486fb71e385b9aea33aa02b7d8                                               	saml/acumos-gerrit-image-classification-committers
 ldap:cn=acumos-gerrit-image-classification-committers,ou=Groups,dc=freestandards,dc=org	ldap/acumos-gerrit-image-classification-committers
